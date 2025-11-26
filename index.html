@@ -380,13 +380,13 @@
     }
     .parlay-bg-slot img { object-fit: cover; }
 
-    /* Proper phone-like slip box */
+    /* Phone-like slip box with NO distortion (contain) */
     .parlay-slip-slot {
       position: absolute;
       left: var(--slip-left);
       top: var(--slip-top);
       width: 38%;
-      aspect-ratio: 9 / 19.5;  /* phone screenshot-ish */
+      aspect-ratio: 9 / 19.5;  /* like a phone screenshot */
       border-radius: 18px;
       background: #101010;
       box-shadow: 0 14px 30px rgba(0,0,0,0.8);
@@ -395,9 +395,9 @@
       transform-origin: left top;
       transform: scale(var(--slip-scale));
     }
-    .parlay-slip-slot img { object-fit: cover; }
+    .parlay-slip-slot img { object-fit: contain; }
 
-    /* Player – can move all over */
+    /* Player – can move all over, no distortion */
     .parlay-player-slot {
       position: absolute;
       left: var(--player-left);
@@ -484,7 +484,8 @@
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      Tap any text to edit. Tap the dotted boxes or use the upload buttons to add images.
+      Tap text to edit. Use the dotted boxes or buttons to upload images.  
+      On mobile: <strong>drag with 1 finger</strong>, <strong>pinch with 2 fingers</strong> on the parlay or player to move and resize.
     </div>
 
     <div class="app-header-controls">
@@ -525,77 +526,84 @@
         </label>
       </div>
 
-      <!-- Parlay controls: text + layout + uploads -->
-      <div id="parlay-controls" class="control-row" style="display:none;">
-        <label class="pill">
-          Font
-          <select id="parlay-font-select">
-            <option value="'Bebas Neue', sans-serif">Bebas</option>
-            <option value="'Inter', sans-serif">Inter</option>
-            <option value="system-ui, sans-serif">System</option>
-          </select>
-        </label>
+      <!-- Parlay controls + upload buttons -->
+      <div id="parlay-controls" style="display:none; flex-direction:column; gap:4px; align-items:flex-end;">
+        <div class="control-row">
+          <label class="pill">
+            Font
+            <select id="parlay-font-select">
+              <option value="'Bebas Neue', sans-serif">Bebas</option>
+              <option value="'Inter', sans-serif">Inter</option>
+              <option value="system-ui, sans-serif">System</option>
+            </select>
+          </label>
 
-        <label class="pill">
-          Text color
-          <input type="color" id="parlay-text-color" value="#ffffff" />
-        </label>
+          <label class="pill">
+            Text color
+            <input type="color" id="parlay-text-color" value="#ffffff" />
+          </label>
 
-        <label class="pill">
-          Text size
-          <input type="number" id="parlay-text-size" min="18" max="60" value="30" />
-        </label>
+          <label class="pill">
+            Text size
+            <input type="number" id="parlay-text-size" min="18" max="60" value="30" />
+          </label>
+        </div>
 
-        <label class="pill">
-          T1 X
-          <input type="range" id="text1-x" min="0" max="100" value="5" />
-        </label>
-        <label class="pill">
-          T1 Y
-          <input type="range" id="text1-y" min="0" max="40" value="4" />
-        </label>
+        <div class="control-row">
+          <label class="pill">
+            T1 X
+            <input type="range" id="text1-x" min="0" max="100" value="5" />
+          </label>
+          <label class="pill">
+            T1 Y
+            <input type="range" id="text1-y" min="0" max="40" value="4" />
+          </label>
+          <label class="pill">
+            T2 X
+            <input type="range" id="text2-x" min="0" max="100" value="5" />
+          </label>
+          <label class="pill">
+            T2 Y
+            <input type="range" id="text2-y" min="0" max="90" value="86" />
+          </label>
+        </div>
 
-        <label class="pill">
-          T2 X
-          <input type="range" id="text2-x" min="0" max="100" value="5" />
-        </label>
-        <label class="pill">
-          T2 Y
-          <input type="range" id="text2-y" min="0" max="90" value="86" />
-        </label>
+        <div class="control-row">
+          <label class="pill">
+            Slip X
+            <input type="range" id="slip-x" min="0" max="45" value="5" />
+          </label>
+          <label class="pill">
+            Slip Y
+            <input type="range" id="slip-y" min="0" max="50" value="12" />
+          </label>
+          <label class="pill">
+            Slip size
+            <input type="range" id="slip-size" min="70" max="130" value="130" />
+          </label>
+        </div>
 
-        <label class="pill">
-          Slip X
-          <input type="range" id="slip-x" min="0" max="40" value="5" />
-        </label>
-        <label class="pill">
-          Slip Y
-          <input type="range" id="slip-y" min="0" max="40" value="12" />
-        </label>
-        <label class="pill">
-          Slip size
-          <input type="range" id="slip-size" min="70" max="130" value="130" />
-        </label>
+        <div class="control-row">
+          <label class="pill">
+            Player X
+            <input type="range" id="player-x" min="0" max="80" value="55" />
+          </label>
+          <label class="pill">
+            Player Y
+            <input type="range" id="player-y" min="0" max="50" value="0" />
+          </label>
+          <label class="pill">
+            Player size
+            <input type="range" id="player-size" min="70" max="130" value="130" />
+          </label>
+        </div>
 
-        <label class="pill">
-          Player X
-          <input type="range" id="player-x" min="0" max="70" value="55" />
-        </label>
-        <label class="pill">
-          Player Y
-          <input type="range" id="player-y" min="0" max="40" value="0" />
-        </label>
-        <label class="pill">
-          Player size
-          <input type="range" id="player-size" min="70" max="130" value="130" />
-        </label>
-
-        <!-- Upload buttons -->
-        <button type="button" id="bg-upload-btn" class="btn-secondary">BG image</button>
-        <button type="button" id="slip-upload-btn" class="btn-secondary">Parlay image</button>
-        <button type="button" id="player-upload-btn" class="btn-secondary">Player PNG</button>
-
-        <button type="button" id="reset-parlay" class="btn-secondary">Reset layout</button>
+        <div class="control-row">
+          <button type="button" id="bg-upload-btn" class="btn-secondary">BG image</button>
+          <button type="button" id="slip-upload-btn" class="btn-secondary">Parlay image</button>
+          <button type="button" id="player-upload-btn" class="btn-secondary">Player PNG</button>
+          <button type="button" id="reset-parlay" class="btn-secondary">Reset layout</button>
+        </div>
       </div>
 
       <button id="download-btn" class="btn-primary">Download image</button>
@@ -893,7 +901,7 @@
     applySlip();
     applyPlayer();
 
-    // Reset parlay to a good default layout
+    // Reset parlay to default layout
     const resetParlayBtn = document.getElementById("reset-parlay");
     function resetParlayLayout() {
       fontSelect.value = "'Bebas Neue', sans-serif";
@@ -918,6 +926,128 @@
       applyPlayer();
     }
     resetParlayBtn.addEventListener("click", resetParlayLayout);
+
+    // --- TOUCH DRAG + PINCH FOR SLIP & PLAYER ---
+
+    const slipSlot = document.querySelector(".parlay-slip-slot");
+    const playerSlot = document.querySelector(".parlay-player-slot");
+
+    function getCssPercentVar(name) {
+      const styles = getComputedStyle(document.documentElement);
+      const raw = styles.getPropertyValue(name);
+      return parseFloat(raw.replace("%","").trim()) || 0;
+    }
+    function getCssNumberVar(name, fallback) {
+      const styles = getComputedStyle(document.documentElement);
+      const raw = styles.getPropertyValue(name);
+      const v = parseFloat(raw.trim());
+      return isNaN(v) ? fallback : v;
+    }
+
+    function addTouchHandlers(slot, kind) {
+      if (!slot) return;
+      let dragging = false;
+      let pinching = false;
+      let startX = 0, startY = 0;
+      let startLeft = 0, startTopOrBottom = 0;
+      let startScale = 1, startDist = 0;
+
+      slot.addEventListener("touchstart", e => {
+        if (!isMobile()) return; // only on phones/tablets
+        if (e.touches.length === 1) {
+          dragging = true;
+          pinching = false;
+          const t = e.touches[0];
+          startX = t.clientX;
+          startY = t.clientY;
+
+          if (kind === "slip") {
+            startLeft = getCssPercentVar("--slip-left");
+            startTopOrBottom = getCssPercentVar("--slip-top");
+          } else {
+            startLeft = getCssPercentVar("--player-left");
+            startTopOrBottom = getCssPercentVar("--player-bottom");
+          }
+        } else if (e.touches.length === 2) {
+          dragging = false;
+          pinching = true;
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          startDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          if (kind === "slip") {
+            startScale = getCssNumberVar("--slip-scale", 1);
+          } else {
+            startScale = getCssNumberVar("--player-scale", 1);
+          }
+        }
+      }, { passive: false });
+
+      slot.addEventListener("touchmove", e => {
+        if (!isMobile()) return;
+        const touches = e.touches;
+        const rect = sheetEl.getBoundingClientRect();
+
+        if (dragging && touches.length === 1) {
+          e.preventDefault();
+          const t = touches[0];
+          const dxPerc = (t.clientX - startX) / rect.width * 100;
+          const dyPerc = (t.clientY - startY) / rect.height * 100;
+
+          if (kind === "slip") {
+            let newLeft = startLeft + dxPerc;
+            let newTop = startTopOrBottom + dyPerc;
+            newLeft = Math.max(0, Math.min(50, newLeft));
+            newTop = Math.max(0, Math.min(60, newTop));
+            document.documentElement.style.setProperty("--slip-left", newLeft + "%");
+            document.documentElement.style.setProperty("--slip-top", newTop + "%");
+            slipX.value = newLeft;
+            slipY.value = newTop;
+          } else {
+            let newLeft = startLeft + dxPerc;
+            let newBottom = startTopOrBottom - dyPerc; // dragging up = higher bottom
+            newLeft = Math.max(0, Math.min(80, newLeft));
+            newBottom = Math.max(0, Math.min(50, newBottom));
+            document.documentElement.style.setProperty("--player-left", newLeft + "%");
+            document.documentElement.style.setProperty("--player-bottom", newBottom + "%");
+            playerX.value = newLeft;
+            playerY.value = newBottom;
+          }
+        } else if (pinching && touches.length === 2) {
+          e.preventDefault();
+          const t1 = touches[0];
+          const t2 = touches[1];
+          const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          let factor = dist / startDist;
+          let newScale = startScale * factor;
+
+          if (kind === "slip") {
+            newScale = Math.max(0.7, Math.min(1.3, newScale));
+            document.documentElement.style.setProperty("--slip-scale", newScale);
+            slipSize.value = (newScale * 100).toFixed(0);
+          } else {
+            newScale = Math.max(0.7, Math.min(1.3, newScale));
+            document.documentElement.style.setProperty("--player-scale", newScale);
+            playerSize.value = (newScale * 100).toFixed(0);
+          }
+        }
+      }, { passive: false });
+
+      slot.addEventListener("touchend", () => {
+        if (!isMobile()) return;
+        if (event.touches && event.touches.length === 0) {
+          dragging = false;
+          pinching = false;
+        }
+      });
+
+      slot.addEventListener("touchcancel", () => {
+        dragging = false;
+        pinching = false;
+      });
+    }
+
+    addTouchHandlers(slipSlot, "slip");
+    addTouchHandlers(playerSlot, "player");
 
     // DOWNLOAD (desktop: file; mobile: overlay)
     const downloadBtn = document.getElementById("download-btn");
