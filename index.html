@@ -36,19 +36,10 @@
       --parlay-text-size: 30px;
       --parlay-font: "Bebas Neue", sans-serif;
 
-      --t1-left: 5%;   /* bottom text */
+      --t1-left: 5%;
       --t1-bottom: 4%;
-      --t2-left: 5%;   /* top text */
+      --t2-left: 5%;
       --t2-bottom: 86%;
-
-      /* Parlay slip + player defaults (phone-like) */
-      --slip-left: 5%;
-      --slip-top: 12%;
-      --slip-scale: 1.3;       /* default: max size slider */
-
-      --player-left: 55%;
-      --player-bottom: 0%;
-      --player-scale: 1.3;     /* default: max size slider */
     }
 
     * { box-sizing: border-box; }
@@ -96,6 +87,14 @@
       min-width: 260px;
     }
 
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
     select {
       background: rgba(0,0,0,0.85);
       color: #fff;
@@ -104,14 +103,6 @@
       padding: 4px 10px;
       font-size: 13px;
       outline: none;
-    }
-
-    .control-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end;
-      align-items: center;
     }
 
     .pill {
@@ -273,7 +264,7 @@
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;   /* <-- key: no stretching */
       opacity: 0;
       transition: opacity 0.2s;
       pointer-events: none;
@@ -380,28 +371,27 @@
     }
     .parlay-bg-slot img { object-fit: cover; }
 
-    /* Phone-like slip box with NO distortion (contain) */
+    /* Phone-shaped slip container */
     .parlay-slip-slot {
       position: absolute;
-      left: var(--slip-left);
-      top: var(--slip-top);
-      width: 38%;
-      aspect-ratio: 9 / 19.5;  /* like a phone screenshot */
+      left: 5%;
+      top: 10%;
+      width: 40%;
+      height: 80%;
       border-radius: 18px;
-      background: #101010;
+      background: rgba(0,0,0,0.9);
       box-shadow: 0 14px 30px rgba(0,0,0,0.8);
       z-index: 2;
       padding: 8px;
-      transform-origin: left top;
-      transform: scale(var(--slip-scale));
+      transform-origin: center center;
+      transform: translate(0px, 0px) scale(1);
+      touch-action: none; /* allows pointer gestures */
     }
-    .parlay-slip-slot img { object-fit: contain; }
 
-    /* Player – can move all over, no distortion */
     .parlay-player-slot {
       position: absolute;
-      left: var(--player-left);
-      bottom: var(--player-bottom);
+      left: 55%;
+      bottom: 0;
       width: 40%;
       height: 100%;
       border-radius: 0;
@@ -409,7 +399,8 @@
       border: none;
       z-index: 4;
       transform-origin: bottom center;
-      transform: scale(var(--player-scale));
+      transform: translate(0px, 0px) scale(1);
+      touch-action: none;
     }
     .parlay-player-slot img { object-fit: contain; }
 
@@ -484,8 +475,8 @@
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      Tap text to edit. Use the dotted boxes or buttons to upload images.  
-      On mobile: <strong>drag with 1 finger</strong>, <strong>pinch with 2 fingers</strong> on the parlay or player to move and resize.
+      Tap text to edit. Use the dotted boxes or the buttons to upload images.
+      On the parlay template: <strong>drag with one finger</strong> and <strong>pinch with two</strong> on the parlay slip or player.
     </div>
 
     <div class="app-header-controls">
@@ -511,6 +502,7 @@
         </label>
       </div>
 
+      <!-- 3-player colors -->
       <div id="card-color-controls" class="control-row">
         <label class="pill">
           Box 1
@@ -526,7 +518,7 @@
         </label>
       </div>
 
-      <!-- Parlay controls + upload buttons -->
+      <!-- Parlay controls -->
       <div id="parlay-controls" style="display:none; flex-direction:column; gap:4px; align-items:flex-end;">
         <div class="control-row">
           <label class="pill">
@@ -565,36 +557,6 @@
           <label class="pill">
             T2 Y
             <input type="range" id="text2-y" min="0" max="90" value="86" />
-          </label>
-        </div>
-
-        <div class="control-row">
-          <label class="pill">
-            Slip X
-            <input type="range" id="slip-x" min="0" max="45" value="5" />
-          </label>
-          <label class="pill">
-            Slip Y
-            <input type="range" id="slip-y" min="0" max="50" value="12" />
-          </label>
-          <label class="pill">
-            Slip size
-            <input type="range" id="slip-size" min="70" max="130" value="130" />
-          </label>
-        </div>
-
-        <div class="control-row">
-          <label class="pill">
-            Player X
-            <input type="range" id="player-x" min="0" max="80" value="55" />
-          </label>
-          <label class="pill">
-            Player Y
-            <input type="range" id="player-y" min="0" max="50" value="0" />
-          </label>
-          <label class="pill">
-            Player size
-            <input type="range" id="player-size" min="70" max="130" value="130" />
           </label>
         </div>
 
@@ -700,7 +662,7 @@
             <input type="file" accept="image/*" />
           </div>
 
-          <!-- Slip -->
+          <!-- Slip (drag + pinch) -->
           <div class="image-slot parlay-slip-slot">
             <div class="upload-ui">
               <span class="plus">+</span>
@@ -710,7 +672,7 @@
             <input type="file" accept="image/*" />
           </div>
 
-          <!-- Player -->
+          <!-- Player (drag + pinch) -->
           <div class="image-slot parlay-player-slot">
             <div class="upload-ui">
               <span class="plus">+</span>
@@ -747,8 +709,9 @@
     }
 
     const sheetEl = document.getElementById("sheet");
+    const root = document.documentElement;
 
-    // Image uploads (slots)
+    /* ---------- IMAGE UPLOADS ---------- */
     document.querySelectorAll(".image-slot").forEach(slot => {
       const input = slot.querySelector("input[type='file']");
       const img = slot.querySelector("img");
@@ -768,7 +731,7 @@
       });
     });
 
-    // Quick handles for parlay file inputs (for top buttons)
+    // Map top buttons to parlay inputs
     const bgInput = document.querySelector(".parlay-bg-slot input[type='file']");
     const slipInput = document.querySelector(".parlay-slip-slot input[type='file']");
     const playerInput = document.querySelector(".parlay-player-slot input[type='file']");
@@ -777,10 +740,10 @@
     document.getElementById("slip-upload-btn").addEventListener("click", () => slipInput && slipInput.click());
     document.getElementById("player-upload-btn").addEventListener("click", () => playerInput && playerInput.click());
 
-    // BG color
+    /* ---------- BG COLOR & PRESETS ---------- */
     const bgPicker = document.getElementById("bg-color-picker");
     function applyBg(color) {
-      document.documentElement.style.setProperty("--sheet-bg-main", color);
+      root.style.setProperty("--sheet-bg-main", color);
       document.body.style.background =
         `radial-gradient(circle at top, ${color}, #050816 60%)`;
       sheetEl.style.background =
@@ -789,7 +752,6 @@
     applyBg(bgPicker.value);
     bgPicker.addEventListener("input", e => applyBg(e.target.value));
 
-    // BG presets (parlay)
     const bgTemplateSelect = document.getElementById("bg-template-select");
     const parlayBgSlot = document.querySelector(".parlay-bg-slot");
     function applyBgTemplate(value) {
@@ -807,9 +769,9 @@
     applyBgTemplate(bgTemplateSelect.value);
     bgTemplateSelect.addEventListener("change", e => applyBgTemplate(e.target.value));
 
-    // 3-player card colors
+    /* ---------- 3-PLAYER CARD COLORS ---------- */
     function setCardColor(idx, color) {
-      document.documentElement.style.setProperty(`--card${idx}-color`, color);
+      root.style.setProperty(`--card${idx}-color`, color);
     }
     const c1 = document.getElementById("card1-color");
     const c2 = document.getElementById("card2-color");
@@ -821,7 +783,7 @@
     c2.addEventListener("input", e => setCardColor(2, e.target.value));
     c3.addEventListener("input", e => setCardColor(3, e.target.value));
 
-    // Template switching
+    /* ---------- TEMPLATE SWITCHING ---------- */
     const templateSelect = document.getElementById("template-select");
     const tplThree = document.getElementById("template-three");
     const tplParlay = document.getElementById("template-parlay");
@@ -829,7 +791,6 @@
     const parlayControls = document.getElementById("parlay-controls");
 
     function setTemplate(name) {
-      const root = document.documentElement;
       const styles = getComputedStyle(root);
       const isThree = name === "three";
 
@@ -849,7 +810,7 @@
     setTemplate(templateSelect.value);
     templateSelect.addEventListener("change", e => setTemplate(e.target.value));
 
-    // Parlay text + layout controls
+    /* ---------- PARLAY TEXT CONTROLS ---------- */
     const fontSelect = document.getElementById("parlay-font-select");
     const textColorInput = document.getElementById("parlay-text-color");
     const textSizeInput = document.getElementById("parlay-text-size");
@@ -859,16 +820,17 @@
     const text2Y = document.getElementById("text2-y");
 
     function applyParlayTextStyle() {
-      document.documentElement.style.setProperty("--parlay-text-color", textColorInput.value);
-      document.documentElement.style.setProperty("--parlay-text-size", textSizeInput.value + "px");
-      document.documentElement.style.setProperty("--parlay-font", fontSelect.value);
+      root.style.setProperty("--parlay-text-color", textColorInput.value);
+      root.style.setProperty("--parlay-text-size", textSizeInput.value + "px");
+      root.style.setProperty("--parlay-font", fontSelect.value);
     }
     function applyParlayTextPositions() {
-      document.documentElement.style.setProperty("--t1-left", text1X.value + "%");
-      document.documentElement.style.setProperty("--t1-bottom", text1Y.value + "%");
-      document.documentElement.style.setProperty("--t2-left", text2X.value + "%");
-      document.documentElement.style.setProperty("--t2-bottom", text2Y.value + "%");
+      root.style.setProperty("--t1-left", text1X.value + "%");
+      root.style.setProperty("--t1-bottom", text1Y.value + "%");
+      root.style.setProperty("--t2-left", text2X.value + "%");
+      root.style.setProperty("--t2-bottom", text2Y.value + "%");
     }
+
     [fontSelect, textColorInput, textSizeInput].forEach(el =>
       el.addEventListener("input", applyParlayTextStyle)
     );
@@ -878,178 +840,125 @@
     applyParlayTextStyle();
     applyParlayTextPositions();
 
-    // Slip + player sliders
-    const slipX = document.getElementById("slip-x");
-    const slipY = document.getElementById("slip-y");
-    const slipSize = document.getElementById("slip-size");
-    const playerX = document.getElementById("player-x");
-    const playerY = document.getElementById("player-y");
-    const playerSize = document.getElementById("player-size");
+    /* ---------- DRAG + PINCH (SLIP & PLAYER) ---------- */
+    function makeDraggableZoomable(el, opts = {}) {
+      if (!el) return;
+      const state = {
+        x: 0,
+        y: 0,
+        scale: 1
+      };
+      const minScale = opts.minScale || 0.6;
+      const maxScale = opts.maxScale || 1.6;
 
-    function applySlip() {
-      document.documentElement.style.setProperty("--slip-left", slipX.value + "%");
-      document.documentElement.style.setProperty("--slip-top", slipY.value + "%");
-      document.documentElement.style.setProperty("--slip-scale", slipSize.value / 100);
-    }
-    function applyPlayer() {
-      document.documentElement.style.setProperty("--player-left", playerX.value + "%");
-      document.documentElement.style.setProperty("--player-bottom", playerY.value + "%");
-      document.documentElement.style.setProperty("--player-scale", playerSize.value / 100);
-    }
-    [slipX, slipY, slipSize].forEach(el => el.addEventListener("input", applySlip));
-    [playerX, playerY, playerSize].forEach(el => el.addEventListener("input", applyPlayer));
-    applySlip();
-    applyPlayer();
+      const pointers = new Map();
+      let startState = null;
+      let startCenter = null;
+      let startDistance = 0;
 
-    // Reset parlay to default layout
-    const resetParlayBtn = document.getElementById("reset-parlay");
-    function resetParlayLayout() {
+      function updateTransform() {
+        el.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+      }
+
+      el.style.transformOrigin = opts.origin || "center center";
+      el.style.touchAction = "none";
+      updateTransform();
+
+      el.addEventListener("pointerdown", e => {
+        el.setPointerCapture(e.pointerId);
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (pointers.size === 1) {
+          // drag start
+          startState = { ...state };
+          startCenter = { x: e.clientX, y: e.clientY };
+          startDistance = 0;
+        } else if (pointers.size === 2) {
+          // pinch start
+          const pts = Array.from(pointers.values());
+          startState = { ...state };
+          const dx = pts[0].x - pts[1].x;
+          const dy = pts[0].y - pts[1].y;
+          startDistance = Math.hypot(dx, dy);
+        }
+      });
+
+      el.addEventListener("pointermove", e => {
+        if (!pointers.has(e.pointerId)) return;
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (pointers.size === 1 && startCenter) {
+          // drag
+          const p = pointers.get(e.pointerId);
+          const dx = p.x - startCenter.x;
+          const dy = p.y - startCenter.y;
+          state.x = startState.x + dx;
+          state.y = startState.y + dy;
+          updateTransform();
+        } else if (pointers.size >= 2 && startDistance > 0) {
+          // pinch zoom
+          const pts = Array.from(pointers.values());
+          const dx = pts[0].x - pts[1].x;
+          const dy = pts[0].y - pts[1].y;
+          const dist = Math.hypot(dx, dy);
+          let factor = dist / startDistance;
+          state.scale = Math.max(minScale, Math.min(maxScale, startState.scale * factor));
+          updateTransform();
+        }
+      });
+
+      function endPointer(e) {
+        if (pointers.has(e.pointerId)) {
+          pointers.delete(e.pointerId);
+        }
+        if (pointers.size === 0) {
+          startCenter = null;
+          startDistance = 0;
+          startState = null;
+        }
+      }
+
+      el.addEventListener("pointerup", endPointer);
+      el.addEventListener("pointercancel", endPointer);
+
+      // Optional: mouse wheel zoom on desktop
+      el.addEventListener("wheel", e => {
+        e.preventDefault();
+        const delta = -e.deltaY * 0.001;
+        state.scale = Math.max(minScale, Math.min(maxScale, state.scale * (1 + delta)));
+        updateTransform();
+      }, { passive: false });
+
+      // Reset helper
+      return () => {
+        state.x = 0;
+        state.y = 0;
+        state.scale = 1;
+        updateTransform();
+      };
+    }
+
+    const slipSlot = document.querySelector(".parlay-slip-slot");
+    const playerSlot = document.querySelector(".parlay-player-slot");
+    const resetSlipTransform = makeDraggableZoomable(slipSlot, { minScale: 0.7, maxScale: 1.4 });
+    const resetPlayerTransform = makeDraggableZoomable(playerSlot, { minScale: 0.7, maxScale: 1.6, origin: "bottom center" });
+
+    // Reset button resets text + slip/player transforms
+    document.getElementById("reset-parlay").addEventListener("click", () => {
       fontSelect.value = "'Bebas Neue', sans-serif";
       textColorInput.value = "#ffffff";
       textSizeInput.value = 30;
-
       text1X.value = 5;
       text1Y.value = 4;
       text2X.value = 5;
       text2Y.value = 86;
-
-      slipX.value = 5;
-      slipY.value = 12;
-      slipSize.value = 130;
-      playerX.value = 55;
-      playerY.value = 0;
-      playerSize.value = 130;
-
       applyParlayTextStyle();
       applyParlayTextPositions();
-      applySlip();
-      applyPlayer();
-    }
-    resetParlayBtn.addEventListener("click", resetParlayLayout);
+      if (resetSlipTransform) resetSlipTransform();
+      if (resetPlayerTransform) resetPlayerTransform();
+    });
 
-    // --- TOUCH DRAG + PINCH FOR SLIP & PLAYER ---
-
-    const slipSlot = document.querySelector(".parlay-slip-slot");
-    const playerSlot = document.querySelector(".parlay-player-slot");
-
-    function getCssPercentVar(name) {
-      const styles = getComputedStyle(document.documentElement);
-      const raw = styles.getPropertyValue(name);
-      return parseFloat(raw.replace("%","").trim()) || 0;
-    }
-    function getCssNumberVar(name, fallback) {
-      const styles = getComputedStyle(document.documentElement);
-      const raw = styles.getPropertyValue(name);
-      const v = parseFloat(raw.trim());
-      return isNaN(v) ? fallback : v;
-    }
-
-    function addTouchHandlers(slot, kind) {
-      if (!slot) return;
-      let dragging = false;
-      let pinching = false;
-      let startX = 0, startY = 0;
-      let startLeft = 0, startTopOrBottom = 0;
-      let startScale = 1, startDist = 0;
-
-      slot.addEventListener("touchstart", e => {
-        if (!isMobile()) return; // only on phones/tablets
-        if (e.touches.length === 1) {
-          dragging = true;
-          pinching = false;
-          const t = e.touches[0];
-          startX = t.clientX;
-          startY = t.clientY;
-
-          if (kind === "slip") {
-            startLeft = getCssPercentVar("--slip-left");
-            startTopOrBottom = getCssPercentVar("--slip-top");
-          } else {
-            startLeft = getCssPercentVar("--player-left");
-            startTopOrBottom = getCssPercentVar("--player-bottom");
-          }
-        } else if (e.touches.length === 2) {
-          dragging = false;
-          pinching = true;
-          const t1 = e.touches[0];
-          const t2 = e.touches[1];
-          startDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-          if (kind === "slip") {
-            startScale = getCssNumberVar("--slip-scale", 1);
-          } else {
-            startScale = getCssNumberVar("--player-scale", 1);
-          }
-        }
-      }, { passive: false });
-
-      slot.addEventListener("touchmove", e => {
-        if (!isMobile()) return;
-        const touches = e.touches;
-        const rect = sheetEl.getBoundingClientRect();
-
-        if (dragging && touches.length === 1) {
-          e.preventDefault();
-          const t = touches[0];
-          const dxPerc = (t.clientX - startX) / rect.width * 100;
-          const dyPerc = (t.clientY - startY) / rect.height * 100;
-
-          if (kind === "slip") {
-            let newLeft = startLeft + dxPerc;
-            let newTop = startTopOrBottom + dyPerc;
-            newLeft = Math.max(0, Math.min(50, newLeft));
-            newTop = Math.max(0, Math.min(60, newTop));
-            document.documentElement.style.setProperty("--slip-left", newLeft + "%");
-            document.documentElement.style.setProperty("--slip-top", newTop + "%");
-            slipX.value = newLeft;
-            slipY.value = newTop;
-          } else {
-            let newLeft = startLeft + dxPerc;
-            let newBottom = startTopOrBottom - dyPerc; // dragging up = higher bottom
-            newLeft = Math.max(0, Math.min(80, newLeft));
-            newBottom = Math.max(0, Math.min(50, newBottom));
-            document.documentElement.style.setProperty("--player-left", newLeft + "%");
-            document.documentElement.style.setProperty("--player-bottom", newBottom + "%");
-            playerX.value = newLeft;
-            playerY.value = newBottom;
-          }
-        } else if (pinching && touches.length === 2) {
-          e.preventDefault();
-          const t1 = touches[0];
-          const t2 = touches[1];
-          const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
-          let factor = dist / startDist;
-          let newScale = startScale * factor;
-
-          if (kind === "slip") {
-            newScale = Math.max(0.7, Math.min(1.3, newScale));
-            document.documentElement.style.setProperty("--slip-scale", newScale);
-            slipSize.value = (newScale * 100).toFixed(0);
-          } else {
-            newScale = Math.max(0.7, Math.min(1.3, newScale));
-            document.documentElement.style.setProperty("--player-scale", newScale);
-            playerSize.value = (newScale * 100).toFixed(0);
-          }
-        }
-      }, { passive: false });
-
-      slot.addEventListener("touchend", () => {
-        if (!isMobile()) return;
-        if (event.touches && event.touches.length === 0) {
-          dragging = false;
-          pinching = false;
-        }
-      });
-
-      slot.addEventListener("touchcancel", () => {
-        dragging = false;
-        pinching = false;
-      });
-    }
-
-    addTouchHandlers(slipSlot, "slip");
-    addTouchHandlers(playerSlot, "player");
-
-    // DOWNLOAD (desktop: file; mobile: overlay)
+    /* ---------- DOWNLOAD ---------- */
     const downloadBtn = document.getElementById("download-btn");
     const hiddenLink = document.getElementById("hidden-download-link");
     const overlay = document.getElementById("download-overlay");
