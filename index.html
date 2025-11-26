@@ -14,9 +14,9 @@
       --sheet-width-wide: 1200;
       --sheet-height-wide: 675;
 
-      /* Phone canvas (parlay) */
+      /* Phone canvas (parlay) - slightly less extreme than before */
       --sheet-width-phone: 900;
-      --sheet-height-phone: 1600;
+      --sheet-height-phone: 1500;
 
       /* Start in wide mode */
       --sheet-width: 1200;
@@ -41,14 +41,14 @@
       --t2-left: 5%;   /* top text 2 */
       --t2-bottom: 86%;
 
-      /* Parlay slip + player defaults (phone‑ish) */
+      /* Parlay slip + player defaults (tuned less “crunched”) */
       --slip-left: 5%;
-      --slip-top: 10%;
-      --slip-width: 35%;
+      --slip-top: 12%;
+      --slip-width: 28%;
 
-      --player-right: 8%;
+      --player-right: 12%;
       --player-bottom: 0%;
-      --player-width: 32%;
+      --player-width: 30%;
     }
 
     * { box-sizing: border-box; }
@@ -555,15 +555,15 @@
         </label>
         <label class="pill">
           Slip Y
-          <input type="range" id="slip-y" min="0" max="25" value="10" />
+          <input type="range" id="slip-y" min="0" max="25" value="12" />
         </label>
         <label class="pill">
           Slip width
-          <input type="range" id="slip-width" min="25" max="60" value="35" />
+          <input type="range" id="slip-width" min="25" max="60" value="28" />
         </label>
         <label class="pill">
           Player X
-          <input type="range" id="player-x" min="0" max="50" value="8" />
+          <input type="range" id="player-x" min="0" max="50" value="12" />
         </label>
         <label class="pill">
           Player Y
@@ -571,7 +571,7 @@
         </label>
         <label class="pill">
           Player width
-          <input type="range" id="player-width" min="20" max="50" value="32" />
+          <input type="range" id="player-width" min="20" max="50" value="30" />
         </label>
       </div>
 
@@ -796,11 +796,23 @@
       parlayControls.style.display = isThree ? "none" : "flex";
 
       if (isThree) {
-        document.documentElement.style.setProperty("--sheet-width", getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-wide"));
-        document.documentElement.style.setProperty("--sheet-height", getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-wide"));
+        document.documentElement.style.setProperty(
+          "--sheet-width",
+          getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-wide")
+        );
+        document.documentElement.style.setProperty(
+          "--sheet-height",
+          getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-wide")
+        );
       } else {
-        document.documentElement.style.setProperty("--sheet-width", getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-phone"));
-        document.documentElement.style.setProperty("--sheet-height", getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-phone"));
+        document.documentElement.style.setProperty(
+          "--sheet-width",
+          getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-phone")
+        );
+        document.documentElement.style.setProperty(
+          "--sheet-height",
+          getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-phone")
+        );
       }
     }
     setTemplate(templateSelect.value);
