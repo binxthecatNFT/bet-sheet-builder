@@ -11,16 +11,16 @@
   <style>
     :root {
       /* Wide canvas (3-player) */
-      --sheet-width-wide: 1200;
-      --sheet-height-wide: 675;
+      --sheet-width-wide: 1600;
+      --sheet-height-wide: 900;
 
-      /* Phone canvas (parlay) - slightly less extreme than before */
-      --sheet-width-phone: 900;
-      --sheet-height-phone: 1500;
+      /* Phone canvas (parlay) */
+      --sheet-width-phone: 1080;
+      --sheet-height-phone: 1920;
 
       /* Start in wide mode */
-      --sheet-width: 1200;
-      --sheet-height: 675;
+      --sheet-width: 1600;
+      --sheet-height: 900;
 
       --sheet-bg-main: #20274a;
       --text-main: #ffffff;
@@ -36,19 +36,19 @@
       --parlay-text-size: 34px;
       --parlay-font: "Bebas Neue", sans-serif;
 
-      --t1-left: 5%;   /* bottom text 1 */
+      --t1-left: 5%;   /* bottom text */
       --t1-bottom: 4%;
-      --t2-left: 5%;   /* top text 2 */
+      --t2-left: 5%;   /* top text */
       --t2-bottom: 86%;
 
-      /* Parlay slip + player defaults (tuned less “crunched”) */
-      --slip-left: 5%;
+      /* Parlay slip + player defaults (more natural) */
+      --slip-left: 4%;
       --slip-top: 12%;
-      --slip-width: 28%;
+      --slip-scale: 1;    /* true zoom */
 
-      --player-right: 12%;
+      --player-right: 10%;
       --player-bottom: 0%;
-      --player-width: 30%;
+      --player-scale: 1;  /* true zoom */
     }
 
     * { box-sizing: border-box; }
@@ -319,9 +319,7 @@
 
     .player-image-slot { height: 230px; }
 
-    .player-body {
-      padding: 10px 14px 14px;
-    }
+    .player-body { padding: 10px 14px 14px; }
 
     .player-name {
       font-family: "Bebas Neue", sans-serif;
@@ -374,13 +372,15 @@
       position: absolute;
       left: var(--slip-left);
       top: var(--slip-top);
-      width: var(--slip-width);
+      width: 40%;
       height: 82%;
       border-radius: 18px;
       background: #101010;
       box-shadow: 0 14px 30px rgba(0,0,0,0.8);
       z-index: 2;
       padding: 8px;
+      transform-origin: top left;
+      transform: scale(var(--slip-scale));
     }
     .parlay-slip-slot img { object-fit: contain; }
 
@@ -388,12 +388,14 @@
       position: absolute;
       right: var(--player-right);
       bottom: var(--player-bottom);
-      width: var(--player-width);
+      width: 52%;
       height: 95%;
       border-radius: 0;
       background: transparent;
       border: none;
       z-index: 4;
+      transform-origin: bottom center;
+      transform: scale(var(--player-scale));
     }
     .parlay-player-slot img { object-fit: contain; }
 
@@ -453,7 +455,6 @@
       cursor: pointer;
     }
 
-    /* Responsive tweaks */
     @media (max-width: 900px) {
       .app-header {
         max-width: 100%;
@@ -491,12 +492,12 @@
         </label>
 
         <label class="pill">
-          BG Preset
+          BG preset
           <select id="bg-template-select">
             <option value="none" selected>None / Upload</option>
-            <option value="stadium-blue">Stadium Blue</option>
-            <option value="stadium-green">Stadium Green</option>
-            <option value="dark-gradient">Dark Gradient</option>
+            <option value="stadium-blue">Stadium blue</option>
+            <option value="stadium-green">Stadium green</option>
+            <option value="dark-gradient">Dark gradient</option>
           </select>
         </label>
       </div>
@@ -530,7 +531,7 @@
           <input type="color" id="parlay-text-color" value="#ffffff" />
         </label>
         <label class="pill">
-          Size
+          Text size
           <input type="number" id="parlay-text-size" min="18" max="60" value="34" />
         </label>
         <label class="pill">
@@ -551,27 +552,27 @@
         </label>
         <label class="pill">
           Slip X
-          <input type="range" id="slip-x" min="0" max="30" value="5" />
+          <input type="range" id="slip-x" min="0" max="30" value="4" />
         </label>
         <label class="pill">
           Slip Y
           <input type="range" id="slip-y" min="0" max="25" value="12" />
         </label>
         <label class="pill">
-          Slip width
-          <input type="range" id="slip-width" min="25" max="60" value="28" />
+          Slip size
+          <input type="range" id="slip-scale" min="70" max="130" value="100" />
         </label>
         <label class="pill">
           Player X
-          <input type="range" id="player-x" min="0" max="50" value="12" />
+          <input type="range" id="player-x" min="0" max="50" value="10" />
         </label>
         <label class="pill">
           Player Y
           <input type="range" id="player-y" min="0" max="25" value="0" />
         </label>
         <label class="pill">
-          Player width
-          <input type="range" id="player-width" min="20" max="50" value="30" />
+          Player size
+          <input type="range" id="player-scale" min="70" max="140" value="100" />
         </label>
       </div>
 
@@ -789,30 +790,21 @@
     const parlayControls = document.getElementById("parlay-style-controls");
 
     function setTemplate(name) {
+      const root = document.documentElement;
+      const styles = getComputedStyle(root);
       const isThree = name === "three";
+
       tplThree.classList.toggle("active", isThree);
       tplParlay.classList.toggle("active", !isThree);
       cardControls.style.display = isThree ? "flex" : "none";
       parlayControls.style.display = isThree ? "none" : "flex";
 
       if (isThree) {
-        document.documentElement.style.setProperty(
-          "--sheet-width",
-          getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-wide")
-        );
-        document.documentElement.style.setProperty(
-          "--sheet-height",
-          getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-wide")
-        );
+        root.style.setProperty("--sheet-width", styles.getPropertyValue("--sheet-width-wide"));
+        root.style.setProperty("--sheet-height", styles.getPropertyValue("--sheet-height-wide"));
       } else {
-        document.documentElement.style.setProperty(
-          "--sheet-width",
-          getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-phone")
-        );
-        document.documentElement.style.setProperty(
-          "--sheet-height",
-          getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-phone")
-        );
+        root.style.setProperty("--sheet-width", styles.getPropertyValue("--sheet-width-phone"));
+        root.style.setProperty("--sheet-height", styles.getPropertyValue("--sheet-height-phone"));
       }
     }
     setTemplate(templateSelect.value);
@@ -847,28 +839,28 @@
     applyParlayTextStyle();
     applyParlayTextPositions();
 
-    // Slip + player sliders
+    // Slip + player sliders (now using true scale)
     const slipX = document.getElementById("slip-x");
     const slipY = document.getElementById("slip-y");
-    const slipWidth = document.getElementById("slip-width");
+    const slipScaleRange = document.getElementById("slip-scale");
     const playerX = document.getElementById("player-x");
     const playerY = document.getElementById("player-y");
-    const playerWidth = document.getElementById("player-width");
+    const playerScaleRange = document.getElementById("player-scale");
 
     function applySlip() {
       document.documentElement.style.setProperty("--slip-left", slipX.value + "%");
       document.documentElement.style.setProperty("--slip-top", slipY.value + "%");
-      document.documentElement.style.setProperty("--slip-width", slipWidth.value + "%");
+      document.documentElement.style.setProperty("--slip-scale", (slipScaleRange.value / 100).toString());
     }
     function applyPlayer() {
       document.documentElement.style.setProperty("--player-right", playerX.value + "%");
       document.documentElement.style.setProperty("--player-bottom", playerY.value + "%");
-      document.documentElement.style.setProperty("--player-width", playerWidth.value + "%");
+      document.documentElement.style.setProperty("--player-scale", (playerScaleRange.value / 100).toString());
     }
-    [slipX, slipY, slipWidth].forEach(el =>
+    [slipX, slipY, slipScaleRange].forEach(el =>
       el.addEventListener("input", applySlip)
     );
-    [playerX, playerY, playerWidth].forEach(el =>
+    [playerX, playerY, playerScaleRange].forEach(el =>
       el.addEventListener("input", applyPlayer)
     );
     applySlip();
