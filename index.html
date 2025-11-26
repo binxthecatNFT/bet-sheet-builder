@@ -27,14 +27,14 @@
       --parlay-text-size: 34px;
       --parlay-font: "Bebas Neue", sans-serif;
 
-      --t1-left: 5%;    /* bottom text */
+      --t1-left: 5%;   /* bottom main text */
       --t1-bottom: 4%;
-      --t2-left: 5%;    /* top text */
+      --t2-left: 5%;   /* top secondary text */
       --t2-bottom: 86%;
 
       --slip-left: 5%;
-      --slip-top: 8%;
-      --slip-width: 32%;   /* narrower, more “phone-like” */
+      --slip-top: 10%;
+      --slip-width: 32%; /* default phone-ish width */
 
       --player-right: 8%;
       --player-bottom: 0%;
@@ -43,8 +43,14 @@
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    body {
       padding: 16px;
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: radial-gradient(circle at top, var(--sheet-bg-main), #050816 60%);
@@ -55,9 +61,14 @@
       gap: 8px;
     }
 
-    .app-header {
+    .app-header,
+    .helper-note,
+    #sheet {
       width: 100%;
-      max-width: var(--sheet-width);
+      max-width: 100%;
+    }
+
+    .app-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -67,13 +78,24 @@
       color: var(--text-muted);
     }
 
-    .app-header-left { flex: 1 1 auto; }
+    .app-header-left {
+      flex: 1 1 220px;
+    }
 
     .app-header-controls {
       display: flex;
       flex-direction: column;
       gap: 6px;
       align-items: flex-end;
+      flex: 0 1 260px;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+      align-items: center;
     }
 
     select {
@@ -84,14 +106,6 @@
       padding: 4px 10px;
       font-size: 13px;
       outline: none;
-    }
-
-    .control-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end;
-      align-items: center;
     }
 
     .pill {
@@ -117,7 +131,7 @@
     }
 
     .pill input[type="range"] {
-      width: 90px;
+      width: 80px;
     }
 
     .pill input[type="number"] {
@@ -158,22 +172,19 @@
     }
 
     .helper-note {
-      max-width: var(--sheet-width);
-      width: 100%;
-      text-align: right;
       font-size: 12px;
       color: var(--text-muted);
+      text-align: right;
     }
 
+    /* SHEET – responsive container */
     #sheet {
-      width: var(--sheet-width);
-      height: var(--sheet-height);
+      aspect-ratio: 1200 / 675;
       border-radius: 20px;
       background: radial-gradient(circle at top, var(--sheet-bg-main), #050816 60%);
       box-shadow: 0 20px 40px rgba(0,0,0,0.8);
       overflow: hidden;
       position: relative;
-      transform-origin: top center; /* we’ll scale this with JS */
     }
 
     .template {
@@ -183,7 +194,7 @@
     }
     .template.active { display: block; }
 
-    /* generic image-slot */
+    /* Generic image slots */
     .image-slot {
       position: relative;
       cursor: pointer;
@@ -245,7 +256,7 @@
 
     .image-slot input[type="file"] { display: none; }
 
-    /* 3-PLAYER TEMPLATE */
+    /* 3-PLAYER TEMPLATE ------------------------------ */
     .sheet-header {
       text-align: center;
       margin-bottom: 18px;
@@ -254,25 +265,25 @@
 
     .sheet-subtitle {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 30px;
+      font-size: 28px;
       letter-spacing: 2px;
     }
 
     .sheet-title {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 68px;
+      font-size: 56px;
       letter-spacing: 3px;
       margin: 4px 0;
     }
 
     .sheet-kicker {
-      font-size: 22px;
+      font-size: 18px;
       color: var(--text-muted);
     }
 
     .player-grid {
       display: flex;
-      gap: 16px;
+      gap: 10px;
       height: calc(100% - 110px);
     }
 
@@ -283,7 +294,7 @@
       border: 1px solid rgba(255,255,255,0.15);
       display: flex;
       flex-direction: column;
-      background: linear-gradient(var(--card1-color), #000000);
+      background: linear-gradient(var(--card1-color), #000);
     }
 
     .player-card[data-card="1"] { background: linear-gradient(var(--card1-color), #000); }
@@ -292,11 +303,13 @@
 
     .player-image-slot { height: 230px; }
 
-    .player-body { padding: 10px 14px 14px; }
+    .player-body {
+      padding: 10px 12px 14px;
+    }
 
     .player-name {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 28px;
+      font-size: 24px;
       text-align: center;
       margin-bottom: 6px;
       letter-spacing: 2px;
@@ -313,13 +326,13 @@
     }
 
     .player-notes {
-      font-size: 14px;
-      margin-left: 18px;
+      font-size: 13px;
+      margin-left: 16px;
       padding-left: 8px;
     }
-    .player-notes li + li { margin-top: 4px; }
+    .player-notes li + li { margin-top: 3px; }
 
-    /* PARLAY TEMPLATE */
+    /* PARLAY TEMPLATE -------------------------------- */
     .template-parlay { position: relative; }
 
     .parlay-wrapper {
@@ -366,7 +379,7 @@
       border-radius: 0;
       background: transparent;
       border: none;
-      z-index: 4; /* above slip and bg */
+      z-index: 4; /* always above slip & bg */
     }
 
     .parlay-player-slot img { object-fit: contain; }
@@ -386,17 +399,43 @@
     .parlay-text-1 { left: var(--t1-left); bottom: var(--t1-bottom); }
     .parlay-text-2 { left: var(--t2-left); bottom: var(--t2-bottom); }
 
-    .editable { outline: none; cursor: text; }
+    .editable {
+      outline: none;
+      cursor: text;
+    }
     .editable:empty::before {
       content: attr(data-placeholder);
       opacity: 0.4;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .app-header-controls {
+        align-items: stretch;
+      }
+      .control-row {
+        justify-content: flex-start;
+      }
+      .sheet-title {
+        font-size: 44px;
+      }
+      .sheet-subtitle {
+        font-size: 22px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      Edit any text and tap the dotted boxes with the big <strong>+</strong> to upload images.
+      Tap text to edit, and tap the dotted boxes with the big <strong>+</strong> to upload images.
     </div>
 
     <div class="app-header-controls">
@@ -468,7 +507,7 @@
         </label>
         <label class="pill">
           Text2 Y
-          <input type="range" id="text2-y" min="0" max="90" value="86" />
+          <input type="range" id="text2-y" min="40" max="96" value="86" />
         </label>
         <label class="pill">
           Slip X
@@ -476,7 +515,7 @@
         </label>
         <label class="pill">
           Slip Y
-          <input type="range" id="slip-y" min="0" max="25" value="8" />
+          <input type="range" id="slip-y" min="0" max="30" value="10" />
         </label>
         <label class="pill">
           Slip width
@@ -501,7 +540,7 @@
   </div>
 
   <div class="helper-note">
-    Parlay template: use a PNG player with transparent background for best overlap.
+    On phones: after Download, long‑press the image in the new tab and choose “Save Image”.
   </div>
 
   <div id="sheet">
@@ -609,7 +648,7 @@
           <input type="file" accept="image/*" />
         </div>
 
-        <!-- Two movable texts -->
+        <!-- Text areas -->
         <div class="parlay-bottom-text parlay-text-1 editable" contenteditable="true">
           WEEK 13 PARLAYS
         </div>
@@ -622,30 +661,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    const sheetEl = document.getElementById("sheet");
-
-    function fitSheetToViewport() {
-      if (!sheetEl) return;
-      const padding = 24; // a bit of margin on each side
-      const available = window.innerWidth - padding;
-      const scale = Math.min(1, available / 1200); // 1200 = sheet width
-      sheetEl.style.transform = `scale(${scale})`;
-    }
-    window.addEventListener("resize", fitSheetToViewport);
-    fitSheetToViewport();
-
-    function shadeColor(color, amount) {
-      const num = parseInt(color.slice(1), 16);
-      let r = (num >> 16) + amount;
-      let g = ((num >> 8) & 0x00ff) + amount;
-      let b = (num & 0x0000ff) + amount;
-      r = Math.min(255, Math.max(0, r));
-      g = Math.min(255, Math.max(0, g));
-      b = Math.min(255, Math.max(0, b));
-      return "#" + (r << 16 | g << 8 | b).toString(16).padStart(6, "0");
+    // Simple mobile check
+    function isMobile() {
+      return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
-    // Image uploads
+    // Upload handlers
     document.querySelectorAll(".image-slot").forEach(slot => {
       const input = slot.querySelector("input[type='file']");
       const img = slot.querySelector("img");
@@ -665,7 +686,8 @@
       });
     });
 
-    // BG color
+    // Background color
+    const sheetEl = document.getElementById("sheet");
     const bgPicker = document.getElementById("bg-color-picker");
     function applyBg(color) {
       document.documentElement.style.setProperty("--sheet-bg-main", color);
@@ -680,14 +702,14 @@
     // BG presets for parlay template
     const bgTemplateSelect = document.getElementById("bg-template-select");
     const parlayBgSlot = document.querySelector(".parlay-bg-slot");
-    function applyBgTemplate(v) {
+    function applyBgTemplate(value) {
       if (!parlayBgSlot) return;
-      let bg = "#111";
-      if (v === "stadium-blue") {
+      let bg = "";
+      if (value === "stadium-blue") {
         bg = "radial-gradient(circle at top, #1b3f84 0%, #020614 55%), linear-gradient(to top, #0b0f22 15%, transparent 45%)";
-      } else if (v === "stadium-green") {
-        bg = "linear-gradient(to top, #0b5c2b 8%, transparent 40%), radial-gradient(circle at top, #1a3c7a 0%, #030814 55%)";
-      } else if (v === "dark-gradient") {
+      } else if (value === "stadium-green") {
+        bg = "linear-gradient(to top, #0b5c2b 10%, transparent 40%), radial-gradient(circle at top, #1a3c7a 0%, #030814 55%)";
+      } else if (value === "dark-gradient") {
         bg = "radial-gradient(circle at top, #391a5f 0%, #050816 60%)";
       }
       parlayBgSlot.style.background = bg;
@@ -696,8 +718,8 @@
     bgTemplateSelect.addEventListener("change", e => applyBgTemplate(e.target.value));
 
     // 3-player card colors
-    function applyCardColor(i, color) {
-      document.documentElement.style.setProperty(`--card${i}-color`, color);
+    function applyCardColor(cardIndex, color) {
+      document.documentElement.style.setProperty(`--card${cardIndex}-color`, color);
     }
     const c1 = document.getElementById("card1-color");
     const c2 = document.getElementById("card2-color");
@@ -735,13 +757,13 @@
     const text2X = document.getElementById("text2-x");
     const text2Y = document.getElementById("text2-y");
 
-    function applyTextStyle() {
+    function applyParlayTextStyle() {
       document.documentElement.style.setProperty("--parlay-text-color", textColorInput.value);
       document.documentElement.style.setProperty("--parlay-text-size", textSizeInput.value + "px");
       document.documentElement.style.setProperty("--parlay-font", fontSelect.value);
     }
 
-    function applyTextPos() {
+    function applyParlayTextPositions() {
       document.documentElement.style.setProperty("--t1-left", text1X.value + "%");
       document.documentElement.style.setProperty("--t1-bottom", text1Y.value + "%");
       document.documentElement.style.setProperty("--t2-left", text2X.value + "%");
@@ -749,82 +771,108 @@
     }
 
     [fontSelect, textColorInput, textSizeInput].forEach(el =>
-      el.addEventListener("input", applyTextStyle)
+      el.addEventListener("input", applyParlayTextStyle)
     );
     [text1X, text1Y, text2X, text2Y].forEach(el =>
-      el.addEventListener("input", applyTextPos)
+      el.addEventListener("input", applyParlayTextPositions)
     );
-    applyTextStyle();
-    applyTextPos();
+    applyParlayTextStyle();
+    applyParlayTextPositions();
 
-    // Slip & player sliders
+    // Parlay slip & player movement
     const slipX = document.getElementById("slip-x");
     const slipY = document.getElementById("slip-y");
     const slipWidth = document.getElementById("slip-width");
+    const playerX = document.getElementById("player-x");
+    const playerY = document.getElementById("player-y");
+    const playerWidth = document.getElementById("player-width");
+
     function applySlip() {
       document.documentElement.style.setProperty("--slip-left", slipX.value + "%");
       document.documentElement.style.setProperty("--slip-top", slipY.value + "%");
       document.documentElement.style.setProperty("--slip-width", slipWidth.value + "%");
     }
-    [slipX, slipY, slipWidth].forEach(el => el.addEventListener("input", applySlip));
-    applySlip();
 
-    const playerX = document.getElementById("player-x");
-    const playerY = document.getElementById("player-y");
-    const playerWidth = document.getElementById("player-width");
     function applyPlayer() {
       document.documentElement.style.setProperty("--player-right", playerX.value + "%");
       document.documentElement.style.setProperty("--player-bottom", playerY.value + "%");
       document.documentElement.style.setProperty("--player-width", playerWidth.value + "%");
     }
-    [playerX, playerY, playerWidth].forEach(el => el.addEventListener("input", applyPlayer));
+
+    [slipX, slipY, slipWidth].forEach(el =>
+      el.addEventListener("input", applySlip)
+    );
+    [playerX, playerY, playerWidth].forEach(el =>
+      el.addEventListener("input", applyPlayer)
+    );
+    applySlip();
     applyPlayer();
 
-    // Download – desktop vs mobile
-    function isMobile() {
-      return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    }
+    // Download button with mobile-friendly behavior
+    const downloadBtn = document.getElementById("download-btn");
 
-    document.getElementById("download-btn").addEventListener("click", () => {
+    downloadBtn.addEventListener("click", () => {
       const mobile = isMobile();
       let previewWin = null;
 
-      // Open the tab synchronously so iOS/Android don't block it
+      // For mobile, open the tab *before* html2canvas so pop-up blockers allow it
       if (mobile) {
         previewWin = window.open("", "_blank");
       }
 
-      html2canvas(sheetEl, { scale: 2 }).then(canvas => {
-        const dataUrl = canvas.toDataURL("image/png");
+      html2canvas(sheetEl, { scale: 2, useCORS: true })
+        .then(canvas => {
+          const dataUrl = canvas.toDataURL("image/png");
 
-        if (mobile) {
-          if (previewWin) {
+          if (!mobile) {
+            // Desktop: try direct download
+            try {
+              const link = document.createElement("a");
+              link.href = dataUrl;
+              link.download = "bet-sheet.png";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            } catch (e) {
+              console.warn("Direct download failed; using preview tab only.", e);
+            }
+          }
+
+          // Mobile: fill the already-opened tab
+          if (mobile && previewWin) {
             previewWin.document.write(
               '<html><head><title>Save image</title></head>' +
               '<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;">' +
-              '<img src="' + dataUrl + '" style="width:100%;height:auto;display:block;" />' +
-              '</body></html>'
+              '<img src="' + dataUrl + '" style="width:100%;height:auto;display:block;max-width:100%;" />' +
+              "</body></html>"
             );
             previewWin.document.close();
             alert('In the new tab: long‑press the image and choose "Save Image".');
-          } else {
-            // Fallback if popup was blocked
+            return;
+          }
+
+          // If mobile tab was blocked, or on desktop, open a preview tab as fallback
+          const win = window.open("", "_blank");
+          if (win) {
+            win.document.write(
+              '<html><head><title>Bet Sheet</title></head>' +
+              '<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;">' +
+              '<img src="' + dataUrl + '" style="width:100%;height:auto;display:block;max-width:100%;" />' +
+              "</body></html>"
+            );
+            win.document.close();
+            if (mobile) {
+              alert('In the new tab: long‑press the image and choose "Save Image".');
+            }
+          } else if (mobile) {
+            // Last-resort fallback
             window.location.href = dataUrl;
           }
-          return;
-        }
-
-        // Desktop: straight download
-        const link = document.createElement("a");
-        link.href = dataUrl;
-        link.download = "bet-sheet.png";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }).catch(err => {
-        console.error("html2canvas failed", err);
-        alert("Sorry, there was a problem creating the image.");
-      });
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Could not create the image. If you used images from another website, try only using uploaded images.");
+        });
     });
   </script>
 </body>
