@@ -27,14 +27,14 @@
       --parlay-text-size: 34px;
       --parlay-font: "Bebas Neue", sans-serif;
 
-      --t1-left: 5%;   /* bottom text (week 13) */
+      --t1-left: 5%;    /* bottom text */
       --t1-bottom: 4%;
-      --t2-left: 5%;   /* top text (@handle) */
+      --t2-left: 5%;    /* top text */
       --t2-bottom: 86%;
 
       --slip-left: 5%;
-      --slip-top: 10%;
-      --slip-width: 35%;
+      --slip-top: 8%;
+      --slip-width: 32%;   /* narrower, more “phone-like” */
 
       --player-right: 8%;
       --player-bottom: 0%;
@@ -45,7 +45,7 @@
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 16px;
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: radial-gradient(circle at top, var(--sheet-bg-main), #050816 60%);
       color: var(--text-main);
@@ -173,6 +173,7 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.8);
       overflow: hidden;
       position: relative;
+      transform-origin: top center; /* we’ll scale this with JS */
     }
 
     .template {
@@ -182,7 +183,7 @@
     }
     .template.active { display: block; }
 
-    /* Generic image-slot styling */
+    /* generic image-slot */
     .image-slot {
       position: relative;
       cursor: pointer;
@@ -244,7 +245,7 @@
 
     .image-slot input[type="file"] { display: none; }
 
-    /* 3-PLAYER TEMPLATE ------------------------------------ */
+    /* 3-PLAYER TEMPLATE */
     .sheet-header {
       text-align: center;
       margin-bottom: 18px;
@@ -291,9 +292,7 @@
 
     .player-image-slot { height: 230px; }
 
-    .player-body {
-      padding: 10px 14px 14px;
-    }
+    .player-body { padding: 10px 14px 14px; }
 
     .player-name {
       font-family: "Bebas Neue", sans-serif;
@@ -318,10 +317,9 @@
       margin-left: 18px;
       padding-left: 8px;
     }
-
     .player-notes li + li { margin-top: 4px; }
 
-    /* PARLAY TEMPLATE -------------------------------------- */
+    /* PARLAY TEMPLATE */
     .template-parlay { position: relative; }
 
     .parlay-wrapper {
@@ -368,7 +366,7 @@
       border-radius: 0;
       background: transparent;
       border: none;
-      z-index: 4; /* ALWAYS above slip & bg */
+      z-index: 4; /* above slip and bg */
     }
 
     .parlay-player-slot img { object-fit: contain; }
@@ -388,31 +386,17 @@
     .parlay-text-1 { left: var(--t1-left); bottom: var(--t1-bottom); }
     .parlay-text-2 { left: var(--t2-left); bottom: var(--t2-bottom); }
 
-    .editable {
-      outline: none;
-      cursor: text;
-    }
+    .editable { outline: none; cursor: text; }
     .editable:empty::before {
       content: attr(data-placeholder);
       opacity: 0.4;
-    }
-
-    @media (max-width: 1300px) {
-      #sheet { transform: scale(0.8); transform-origin: top center; }
-    }
-    @media (max-width: 1000px) {
-      #sheet { transform: scale(0.65); }
-    }
-    @media (max-width: 750px) {
-      body { padding: 12px; }
-      #sheet { transform: scale(0.5); }
     }
   </style>
 </head>
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      Edit any text and click the dotted boxes with the big <strong>+</strong> to upload images.
+      Edit any text and tap the dotted boxes with the big <strong>+</strong> to upload images.
     </div>
 
     <div class="app-header-controls">
@@ -492,11 +476,11 @@
         </label>
         <label class="pill">
           Slip Y
-          <input type="range" id="slip-y" min="0" max="25" value="10" />
+          <input type="range" id="slip-y" min="0" max="25" value="8" />
         </label>
         <label class="pill">
           Slip width
-          <input type="range" id="slip-width" min="25" max="60" value="35" />
+          <input type="range" id="slip-width" min="20" max="55" value="32" />
         </label>
         <label class="pill">
           Player X
@@ -625,7 +609,7 @@
           <input type="file" accept="image/*" />
         </div>
 
-        <!-- Two movable text sections -->
+        <!-- Two movable texts -->
         <div class="parlay-bottom-text parlay-text-1 editable" contenteditable="true">
           WEEK 13 PARLAYS
         </div>
@@ -638,7 +622,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    // Helper
+    const sheetEl = document.getElementById("sheet");
+
+    function fitSheetToViewport() {
+      if (!sheetEl) return;
+      const padding = 24; // a bit of margin on each side
+      const available = window.innerWidth - padding;
+      const scale = Math.min(1, available / 1200); // 1200 = sheet width
+      sheetEl.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener("resize", fitSheetToViewport);
+    fitSheetToViewport();
+
     function shadeColor(color, amount) {
       const num = parseInt(color.slice(1), 16);
       let r = (num >> 16) + amount;
@@ -670,30 +665,29 @@
       });
     });
 
-    // Background color
-    const sheet = document.getElementById("sheet");
+    // BG color
     const bgPicker = document.getElementById("bg-color-picker");
     function applyBg(color) {
       document.documentElement.style.setProperty("--sheet-bg-main", color);
       document.body.style.background =
         `radial-gradient(circle at top, ${color}, #050816 60%)`;
-      sheet.style.background =
+      sheetEl.style.background =
         `radial-gradient(circle at top, ${color}, #050816 60%)`;
     }
     applyBg(bgPicker.value);
     bgPicker.addEventListener("input", e => applyBg(e.target.value));
 
-    // BG presets for parlay
+    // BG presets for parlay template
     const bgTemplateSelect = document.getElementById("bg-template-select");
     const parlayBgSlot = document.querySelector(".parlay-bg-slot");
-    function applyBgTemplate(value) {
+    function applyBgTemplate(v) {
       if (!parlayBgSlot) return;
       let bg = "#111";
-      if (value === "stadium-blue") {
+      if (v === "stadium-blue") {
         bg = "radial-gradient(circle at top, #1b3f84 0%, #020614 55%), linear-gradient(to top, #0b0f22 15%, transparent 45%)";
-      } else if (value === "stadium-green") {
+      } else if (v === "stadium-green") {
         bg = "linear-gradient(to top, #0b5c2b 8%, transparent 40%), radial-gradient(circle at top, #1a3c7a 0%, #030814 55%)";
-      } else if (value === "dark-gradient") {
+      } else if (v === "dark-gradient") {
         bg = "radial-gradient(circle at top, #391a5f 0%, #050816 60%)";
       }
       parlayBgSlot.style.background = bg;
@@ -702,8 +696,8 @@
     bgTemplateSelect.addEventListener("change", e => applyBgTemplate(e.target.value));
 
     // 3-player card colors
-    function applyCardColor(cardIndex, color) {
-      document.documentElement.style.setProperty(`--card${cardIndex}-color`, color);
+    function applyCardColor(i, color) {
+      document.documentElement.style.setProperty(`--card${i}-color`, color);
     }
     const c1 = document.getElementById("card1-color");
     const c2 = document.getElementById("card2-color");
@@ -732,24 +726,22 @@
     setTemplate(templateSelect.value);
     templateSelect.addEventListener("change", e => setTemplate(e.target.value));
 
-    // Parlay text style & position
+    // Parlay text style & positions
     const fontSelect = document.getElementById("parlay-font-select");
     const textColorInput = document.getElementById("parlay-text-color");
     const textSizeInput = document.getElementById("parlay-text-size");
-    const text1 = document.querySelector(".parlay-text-1");
-    const text2 = document.querySelector(".parlay-text-2");
     const text1X = document.getElementById("text1-x");
     const text1Y = document.getElementById("text1-y");
     const text2X = document.getElementById("text2-x");
     const text2Y = document.getElementById("text2-y");
 
-    function applyParlayTextStyle() {
+    function applyTextStyle() {
       document.documentElement.style.setProperty("--parlay-text-color", textColorInput.value);
       document.documentElement.style.setProperty("--parlay-text-size", textSizeInput.value + "px");
       document.documentElement.style.setProperty("--parlay-font", fontSelect.value);
     }
 
-    function applyParlayTextPositions() {
+    function applyTextPos() {
       document.documentElement.style.setProperty("--t1-left", text1X.value + "%");
       document.documentElement.style.setProperty("--t1-bottom", text1Y.value + "%");
       document.documentElement.style.setProperty("--t2-left", text2X.value + "%");
@@ -757,73 +749,81 @@
     }
 
     [fontSelect, textColorInput, textSizeInput].forEach(el =>
-      el.addEventListener("input", applyParlayTextStyle)
+      el.addEventListener("input", applyTextStyle)
     );
     [text1X, text1Y, text2X, text2Y].forEach(el =>
-      el.addEventListener("input", applyParlayTextPositions)
+      el.addEventListener("input", applyTextPos)
     );
-    applyParlayTextStyle();
-    applyParlayTextPositions();
+    applyTextStyle();
+    applyTextPos();
 
-    // Parlay slip & player movement
+    // Slip & player sliders
     const slipX = document.getElementById("slip-x");
     const slipY = document.getElementById("slip-y");
     const slipWidth = document.getElementById("slip-width");
-    const playerX = document.getElementById("player-x");
-    const playerY = document.getElementById("player-y");
-    const playerWidth = document.getElementById("player-width");
-
     function applySlip() {
       document.documentElement.style.setProperty("--slip-left", slipX.value + "%");
       document.documentElement.style.setProperty("--slip-top", slipY.value + "%");
       document.documentElement.style.setProperty("--slip-width", slipWidth.value + "%");
     }
+    [slipX, slipY, slipWidth].forEach(el => el.addEventListener("input", applySlip));
+    applySlip();
 
+    const playerX = document.getElementById("player-x");
+    const playerY = document.getElementById("player-y");
+    const playerWidth = document.getElementById("player-width");
     function applyPlayer() {
       document.documentElement.style.setProperty("--player-right", playerX.value + "%");
       document.documentElement.style.setProperty("--player-bottom", playerY.value + "%");
       document.documentElement.style.setProperty("--player-width", playerWidth.value + "%");
     }
-
-    [slipX, slipY, slipWidth].forEach(el =>
-      el.addEventListener("input", applySlip)
-    );
-    [playerX, playerY, playerWidth].forEach(el =>
-      el.addEventListener("input", applyPlayer)
-    );
-    applySlip();
+    [playerX, playerY, playerWidth].forEach(el => el.addEventListener("input", applyPlayer));
     applyPlayer();
 
-    // Download
+    // Download – desktop vs mobile
     function isMobile() {
       return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
     document.getElementById("download-btn").addEventListener("click", () => {
-      html2canvas(sheet, { scale: 2 }).then(canvas => {
+      const mobile = isMobile();
+      let previewWin = null;
+
+      // Open the tab synchronously so iOS/Android don't block it
+      if (mobile) {
+        previewWin = window.open("", "_blank");
+      }
+
+      html2canvas(sheetEl, { scale: 2 }).then(canvas => {
         const dataUrl = canvas.toDataURL("image/png");
-        if (isMobile()) {
-          const win = window.open("", "_blank");
-          if (win) {
-            win.document.write(
+
+        if (mobile) {
+          if (previewWin) {
+            previewWin.document.write(
               '<html><head><title>Save image</title></head>' +
               '<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;">' +
               '<img src="' + dataUrl + '" style="width:100%;height:auto;display:block;" />' +
-              "</body></html>"
+              '</body></html>'
             );
-            win.document.close();
-            alert('In the new tab, long‑press the image and choose "Save Image".');
+            previewWin.document.close();
+            alert('In the new tab: long‑press the image and choose "Save Image".');
           } else {
+            // Fallback if popup was blocked
             window.location.href = dataUrl;
           }
-        } else {
-          const link = document.createElement("a");
-          link.href = dataUrl;
-          link.download = "bet-sheet.png";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          return;
         }
+
+        // Desktop: straight download
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "bet-sheet.png";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }).catch(err => {
+        console.error("html2canvas failed", err);
+        alert("Sorry, there was a problem creating the image.");
       });
     });
   </script>
