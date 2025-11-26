@@ -10,31 +10,41 @@
 
   <style>
     :root {
-      --sheet-width: 1200px;
-      --sheet-height: 675px;
+      /* Wide canvas (3-player) */
+      --sheet-width-wide: 1200;
+      --sheet-height-wide: 675;
+
+      /* Phone canvas (parlay) */
+      --sheet-width-phone: 900;
+      --sheet-height-phone: 1600;
+
+      /* Start in wide mode */
+      --sheet-width: 1200;
+      --sheet-height: 675;
 
       --sheet-bg-main: #20274a;
       --text-main: #ffffff;
       --text-muted: #c2cade;
 
-      /* 3-player card defaults */
+      /* 3-player colors */
       --card1-color: #6b1118;
       --card2-color: #6b3a11;
       --card3-color: #0c2650;
 
-      /* Parlay sheet variables */
+      /* Parlay text */
       --parlay-text-color: #ffffff;
       --parlay-text-size: 34px;
       --parlay-font: "Bebas Neue", sans-serif;
 
-      --t1-left: 5%;   /* bottom main text */
+      --t1-left: 5%;   /* bottom text 1 */
       --t1-bottom: 4%;
-      --t2-left: 5%;   /* top secondary text */
+      --t2-left: 5%;   /* top text 2 */
       --t2-bottom: 86%;
 
+      /* Parlay slip + player defaults (phone‑ish) */
       --slip-left: 5%;
       --slip-top: 10%;
-      --slip-width: 32%; /* default phone-ish width */
+      --slip-width: 35%;
 
       --player-right: 8%;
       --player-bottom: 0%;
@@ -51,7 +61,7 @@
     }
 
     body {
-      padding: 16px;
+      padding: 12px;
       font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: radial-gradient(circle at top, var(--sheet-bg-main), #050816 60%);
       color: var(--text-main);
@@ -61,25 +71,21 @@
       gap: 8px;
     }
 
-    .app-header,
-    .helper-note,
-    #sheet {
-      width: 100%;
-      max-width: 100%;
-    }
-
     .app-header {
+      width: 100%;
+      max-width: 900px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       font-size: 13px;
       color: var(--text-muted);
     }
 
     .app-header-left {
       flex: 1 1 220px;
+      min-width: 220px;
     }
 
     .app-header-controls {
@@ -87,15 +93,7 @@
       flex-direction: column;
       gap: 6px;
       align-items: flex-end;
-      flex: 0 1 260px;
-    }
-
-    .control-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end;
-      align-items: center;
+      min-width: 260px;
     }
 
     select {
@@ -106,6 +104,14 @@
       padding: 4px 10px;
       font-size: 13px;
       outline: none;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+      align-items: center;
     }
 
     .pill {
@@ -172,14 +178,25 @@
     }
 
     .helper-note {
+      max-width: 900px;
+      width: 100%;
+      text-align: right;
       font-size: 12px;
       color: var(--text-muted);
-      text-align: right;
     }
 
-    /* SHEET – responsive container */
+    .sheet-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+
     #sheet {
-      aspect-ratio: 1200 / 675;
+      width: 100%;
+      max-width: 900px;
+      aspect-ratio: var(--sheet-width) / var(--sheet-height);
       border-radius: 20px;
       background: radial-gradient(circle at top, var(--sheet-bg-main), #050816 60%);
       box-shadow: 0 20px 40px rgba(0,0,0,0.8);
@@ -256,7 +273,7 @@
 
     .image-slot input[type="file"] { display: none; }
 
-    /* 3-PLAYER TEMPLATE ------------------------------ */
+    /* 3-PLAYER TEMPLATE */
     .sheet-header {
       text-align: center;
       margin-bottom: 18px;
@@ -265,25 +282,25 @@
 
     .sheet-subtitle {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 28px;
+      font-size: 30px;
       letter-spacing: 2px;
     }
 
     .sheet-title {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 56px;
+      font-size: 68px;
       letter-spacing: 3px;
       margin: 4px 0;
     }
 
     .sheet-kicker {
-      font-size: 18px;
+      font-size: 22px;
       color: var(--text-muted);
     }
 
     .player-grid {
       display: flex;
-      gap: 10px;
+      gap: 16px;
       height: calc(100% - 110px);
     }
 
@@ -294,7 +311,6 @@
       border: 1px solid rgba(255,255,255,0.15);
       display: flex;
       flex-direction: column;
-      background: linear-gradient(var(--card1-color), #000);
     }
 
     .player-card[data-card="1"] { background: linear-gradient(var(--card1-color), #000); }
@@ -304,12 +320,12 @@
     .player-image-slot { height: 230px; }
 
     .player-body {
-      padding: 10px 12px 14px;
+      padding: 10px 14px 14px;
     }
 
     .player-name {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 24px;
+      font-size: 28px;
       text-align: center;
       margin-bottom: 6px;
       letter-spacing: 2px;
@@ -326,13 +342,13 @@
     }
 
     .player-notes {
-      font-size: 13px;
-      margin-left: 16px;
+      font-size: 14px;
+      margin-left: 18px;
       padding-left: 8px;
     }
-    .player-notes li + li { margin-top: 3px; }
+    .player-notes li + li { margin-top: 4px; }
 
-    /* PARLAY TEMPLATE -------------------------------- */
+    /* PARLAY TEMPLATE (phone canvas) */
     .template-parlay { position: relative; }
 
     .parlay-wrapper {
@@ -352,7 +368,6 @@
       background-size: cover;
       background-position: center;
     }
-
     .parlay-bg-slot img { object-fit: cover; }
 
     .parlay-slip-slot {
@@ -360,14 +375,13 @@
       left: var(--slip-left);
       top: var(--slip-top);
       width: var(--slip-width);
-      height: 80%;
+      height: 82%;
       border-radius: 18px;
       background: #101010;
       box-shadow: 0 14px 30px rgba(0,0,0,0.8);
       z-index: 2;
       padding: 8px;
     }
-
     .parlay-slip-slot img { object-fit: contain; }
 
     .parlay-player-slot {
@@ -379,9 +393,8 @@
       border-radius: 0;
       background: transparent;
       border: none;
-      z-index: 4; /* always above slip & bg */
+      z-index: 4;
     }
-
     .parlay-player-slot img { object-fit: contain; }
 
     .parlay-bottom-text {
@@ -395,27 +408,57 @@
       white-space: nowrap;
       z-index: 5;
     }
-
     .parlay-text-1 { left: var(--t1-left); bottom: var(--t1-bottom); }
     .parlay-text-2 { left: var(--t2-left); bottom: var(--t2-bottom); }
 
-    .editable {
-      outline: none;
-      cursor: text;
-    }
+    .editable { outline: none; cursor: text; }
     .editable:empty::before {
       content: attr(data-placeholder);
       opacity: 0.4;
     }
 
-    /* Mobile tweaks */
-    @media (max-width: 768px) {
-      body {
-        padding: 10px;
-      }
+    /* DOWNLOAD OVERLAY (mobiles) */
+    #download-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+      padding: 16px;
+      text-align: center;
+    }
+    #download-overlay.visible { display: flex; }
+    #download-overlay img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 18px rgba(0,0,0,0.8);
+      margin-bottom: 12px;
+    }
+    #download-overlay p {
+      color: #f5f5f5;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    #download-overlay button {
+      border: none;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #333;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 900px) {
       .app-header {
+        max-width: 100%;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
       }
       .app-header-controls {
         align-items: stretch;
@@ -423,11 +466,8 @@
       .control-row {
         justify-content: flex-start;
       }
-      .sheet-title {
-        font-size: 44px;
-      }
-      .sheet-subtitle {
-        font-size: 22px;
+      .sheet-wrapper {
+        justify-content: center;
       }
     }
   </style>
@@ -435,14 +475,14 @@
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      Tap text to edit, and tap the dotted boxes with the big <strong>+</strong> to upload images.
+      Tap any text to edit. Tap the dotted boxes with the big <strong>+</strong> to add images.
     </div>
 
     <div class="app-header-controls">
       <div class="control-row">
         <select id="template-select">
           <option value="three" selected>3-Player Props</option>
-          <option value="parlay">Parlay + Player</option>
+          <option value="parlay">Parlay + Player (Phone)</option>
         </select>
 
         <label class="pill">
@@ -507,7 +547,7 @@
         </label>
         <label class="pill">
           Text2 Y
-          <input type="range" id="text2-y" min="40" max="96" value="86" />
+          <input type="range" id="text2-y" min="0" max="90" value="86" />
         </label>
         <label class="pill">
           Slip X
@@ -515,11 +555,11 @@
         </label>
         <label class="pill">
           Slip Y
-          <input type="range" id="slip-y" min="0" max="30" value="10" />
+          <input type="range" id="slip-y" min="0" max="25" value="10" />
         </label>
         <label class="pill">
           Slip width
-          <input type="range" id="slip-width" min="20" max="55" value="32" />
+          <input type="range" id="slip-width" min="25" max="60" value="35" />
         </label>
         <label class="pill">
           Player X
@@ -540,133 +580,144 @@
   </div>
 
   <div class="helper-note">
-    On phones: after Download, long‑press the image in the new tab and choose “Save Image”.
+    On iPhone/Android: after Download, long‑press the image and choose “Save Image”.
   </div>
 
-  <div id="sheet">
-    <!-- 3-PLAYER TEMPLATE -->
-    <div id="template-three" class="template active">
-      <div class="sheet-header">
-        <div class="sheet-subtitle editable" contenteditable="true">CASHIN SLIP'S</div>
-        <div class="sheet-title editable" contenteditable="true">NBA HIT RATES</div>
-        <div class="sheet-kicker editable" contenteditable="true">3/3 PLAYER PROPS</div>
+  <div class="sheet-wrapper">
+    <div id="sheet">
+      <!-- 3-PLAYER TEMPLATE -->
+      <div id="template-three" class="template active">
+        <div class="sheet-header">
+          <div class="sheet-subtitle editable" contenteditable="true">CASHIN SLIP'S</div>
+          <div class="sheet-title editable" contenteditable="true">NBA HIT RATES</div>
+          <div class="sheet-kicker editable" contenteditable="true">3/3 PLAYER PROPS</div>
+        </div>
+
+        <div class="player-grid">
+          <div class="player-card" data-card="1">
+            <div class="image-slot player-image-slot">
+              <div class="upload-ui">
+                <span class="plus">+</span>
+                <span class="label">Upload player image</span>
+              </div>
+              <img alt="Player 1" />
+              <input type="file" accept="image/*" />
+            </div>
+            <div class="player-body">
+              <div class="player-name editable" contenteditable="true">PLAYER ONE</div>
+              <div class="player-bet editable" contenteditable="true">Over 11.5 Points -119</div>
+              <ul class="player-notes">
+                <li class="editable" contenteditable="true">Hit 5 of last 5</li>
+                <li class="editable" contenteditable="true">Favorable matchup</li>
+                <li class="editable" contenteditable="true">Playing 30+ minutes</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="player-card" data-card="2">
+            <div class="image-slot player-image-slot">
+              <div class="upload-ui">
+                <span class="plus">+</span>
+                <span class="label">Upload player image</span>
+              </div>
+              <img alt="Player 2" />
+              <input type="file" accept="image/*" />
+            </div>
+            <div class="player-body">
+              <div class="player-name editable" contenteditable="true">PLAYER TWO</div>
+              <div class="player-bet editable" contenteditable="true">Over 9.5 Points -113</div>
+              <ul class="player-notes">
+                <li class="editable" contenteditable="true">High usage lately</li>
+                <li class="editable" contenteditable="true">Weak defense vs position</li>
+                <li class="editable" contenteditable="true">Solid minutes floor</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="player-card" data-card="3">
+            <div class="image-slot player-image-slot">
+              <div class="upload-ui">
+                <span class="plus">+</span>
+                <span class="label">Upload player image</span>
+              </div>
+              <img alt="Player 3" />
+              <input type="file" accept="image/*" />
+            </div>
+            <div class="player-body">
+              <div class="player-name editable" contenteditable="true">PLAYER THREE</div>
+              <div class="player-bet editable" contenteditable="true">Over 14.5 Points -105</div>
+              <ul class="player-notes">
+                <li class="editable" contenteditable="true">High shot volume</li>
+                <li class="editable" contenteditable="true">30+ minutes nightly</li>
+                <li class="editable" contenteditable="true">Great matchup</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="player-grid">
-        <div class="player-card" data-card="1">
-          <div class="image-slot player-image-slot">
+      <!-- PARLAY TEMPLATE (phone) -->
+      <div id="template-parlay" class="template template-parlay">
+        <div class="parlay-wrapper">
+          <!-- Background -->
+          <div class="image-slot parlay-bg-slot">
             <div class="upload-ui">
               <span class="plus">+</span>
-              <span class="label">Upload player image</span>
+              <span class="label">Upload background image</span>
             </div>
-            <img alt="Player 1" />
+            <img alt="Background" />
             <input type="file" accept="image/*" />
           </div>
-          <div class="player-body">
-            <div class="player-name editable" contenteditable="true">PLAYER ONE</div>
-            <div class="player-bet editable" contenteditable="true">Over 11.5 Points -119</div>
-            <ul class="player-notes">
-              <li class="editable" contenteditable="true">Hit 5 of last 5</li>
-              <li class="editable" contenteditable="true">Favorable matchup</li>
-              <li class="editable" contenteditable="true">Playing 30+ minutes</li>
-            </ul>
-          </div>
-        </div>
 
-        <div class="player-card" data-card="2">
-          <div class="image-slot player-image-slot">
+          <!-- Slip -->
+          <div class="image-slot parlay-slip-slot">
             <div class="upload-ui">
               <span class="plus">+</span>
-              <span class="label">Upload player image</span>
+              <span class="label">Upload parlay image</span>
             </div>
-            <img alt="Player 2" />
+            <img alt="Parlay slip" />
             <input type="file" accept="image/*" />
           </div>
-          <div class="player-body">
-            <div class="player-name editable" contenteditable="true">PLAYER TWO</div>
-            <div class="player-bet editable" contenteditable="true">Over 9.5 Points -113</div>
-            <ul class="player-notes">
-              <li class="editable" contenteditable="true">High usage lately</li>
-              <li class="editable" contenteditable="true">Weak defense vs position</li>
-              <li class="editable" contenteditable="true">Solid minutes floor</li>
-            </ul>
-          </div>
-        </div>
 
-        <div class="player-card" data-card="3">
-          <div class="image-slot player-image-slot">
+          <!-- Player -->
+          <div class="image-slot parlay-player-slot">
             <div class="upload-ui">
               <span class="plus">+</span>
-              <span class="label">Upload player image</span>
+              <span class="label">Upload player PNG</span>
             </div>
-            <img alt="Player 3" />
+            <img alt="Player" />
             <input type="file" accept="image/*" />
           </div>
-          <div class="player-body">
-            <div class="player-name editable" contenteditable="true">PLAYER THREE</div>
-            <div class="player-bet editable" contenteditable="true">Over 14.5 Points -105</div>
-            <ul class="player-notes">
-              <li class="editable" contenteditable="true">High shot volume</li>
-              <li class="editable" contenteditable="true">30+ minutes nightly</li>
-              <li class="editable" contenteditable="true">Great matchup</li>
-            </ul>
+
+          <div class="parlay-bottom-text parlay-text-1 editable" contenteditable="true">
+            WEEK 13 PARLAYS
+          </div>
+          <div class="parlay-bottom-text parlay-text-2 editable" contenteditable="true">
+            @LETSCASHSLIPS
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- PARLAY TEMPLATE -->
-    <div id="template-parlay" class="template template-parlay">
-      <div class="parlay-wrapper">
-        <!-- Background -->
-        <div class="image-slot parlay-bg-slot">
-          <div class="upload-ui">
-            <span class="plus">+</span>
-            <span class="label">Upload background image</span>
-          </div>
-          <img alt="Background" />
-          <input type="file" accept="image/*" />
-        </div>
+  <!-- Desktop download anchor + mobile overlay -->
+  <a id="hidden-download-link" style="display:none;"></a>
 
-        <!-- Slip -->
-        <div class="image-slot parlay-slip-slot">
-          <div class="upload-ui">
-            <span class="plus">+</span>
-            <span class="label">Upload parlay image</span>
-          </div>
-          <img alt="Parlay slip" />
-          <input type="file" accept="image/*" />
-        </div>
-
-        <!-- Player -->
-        <div class="image-slot parlay-player-slot">
-          <div class="upload-ui">
-            <span class="plus">+</span>
-            <span class="label">Upload player PNG</span>
-          </div>
-          <img alt="Player" />
-          <input type="file" accept="image/*" />
-        </div>
-
-        <!-- Text areas -->
-        <div class="parlay-bottom-text parlay-text-1 editable" contenteditable="true">
-          WEEK 13 PARLAYS
-        </div>
-        <div class="parlay-bottom-text parlay-text-2 editable" contenteditable="true">
-          @LETSCASHSLIPS
-        </div>
-      </div>
-    </div>
+  <div id="download-overlay">
+    <img id="download-preview" alt="Bet sheet preview" />
+    <p>On iPhone/Android: long‑press this image and choose “Save Image”.</p>
+    <button id="close-overlay">Close</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    // Simple mobile check
     function isMobile() {
       return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
-    // Upload handlers
+    const sheetEl = document.getElementById("sheet");
+
+    // Image uploads
     document.querySelectorAll(".image-slot").forEach(slot => {
       const input = slot.querySelector("input[type='file']");
       const img = slot.querySelector("img");
@@ -686,8 +737,7 @@
       });
     });
 
-    // Background color
-    const sheetEl = document.getElementById("sheet");
+    // BG color
     const bgPicker = document.getElementById("bg-color-picker");
     function applyBg(color) {
       document.documentElement.style.setProperty("--sheet-bg-main", color);
@@ -699,16 +749,16 @@
     applyBg(bgPicker.value);
     bgPicker.addEventListener("input", e => applyBg(e.target.value));
 
-    // BG presets for parlay template
+    // BG presets (parlay)
     const bgTemplateSelect = document.getElementById("bg-template-select");
     const parlayBgSlot = document.querySelector(".parlay-bg-slot");
     function applyBgTemplate(value) {
       if (!parlayBgSlot) return;
-      let bg = "";
+      let bg = "transparent";
       if (value === "stadium-blue") {
         bg = "radial-gradient(circle at top, #1b3f84 0%, #020614 55%), linear-gradient(to top, #0b0f22 15%, transparent 45%)";
       } else if (value === "stadium-green") {
-        bg = "linear-gradient(to top, #0b5c2b 10%, transparent 40%), radial-gradient(circle at top, #1a3c7a 0%, #030814 55%)";
+        bg = "linear-gradient(to top, #0b5c2b 8%, transparent 40%), radial-gradient(circle at top, #1a3c7a 0%, #030814 55%)";
       } else if (value === "dark-gradient") {
         bg = "radial-gradient(circle at top, #391a5f 0%, #050816 60%)";
       }
@@ -718,20 +768,20 @@
     bgTemplateSelect.addEventListener("change", e => applyBgTemplate(e.target.value));
 
     // 3-player card colors
-    function applyCardColor(cardIndex, color) {
-      document.documentElement.style.setProperty(`--card${cardIndex}-color`, color);
+    function setCardColor(idx, color) {
+      document.documentElement.style.setProperty(`--card${idx}-color`, color);
     }
     const c1 = document.getElementById("card1-color");
     const c2 = document.getElementById("card2-color");
     const c3 = document.getElementById("card3-color");
-    applyCardColor(1, c1.value);
-    applyCardColor(2, c2.value);
-    applyCardColor(3, c3.value);
-    c1.addEventListener("input", e => applyCardColor(1, e.target.value));
-    c2.addEventListener("input", e => applyCardColor(2, e.target.value));
-    c3.addEventListener("input", e => applyCardColor(3, e.target.value));
+    setCardColor(1, c1.value);
+    setCardColor(2, c2.value);
+    setCardColor(3, c3.value);
+    c1.addEventListener("input", e => setCardColor(1, e.target.value));
+    c2.addEventListener("input", e => setCardColor(2, e.target.value));
+    c3.addEventListener("input", e => setCardColor(3, e.target.value));
 
-    // Template switching
+    // Template switching (also change canvas ratio)
     const templateSelect = document.getElementById("template-select");
     const tplThree = document.getElementById("template-three");
     const tplParlay = document.getElementById("template-parlay");
@@ -744,11 +794,19 @@
       tplParlay.classList.toggle("active", !isThree);
       cardControls.style.display = isThree ? "flex" : "none";
       parlayControls.style.display = isThree ? "none" : "flex";
+
+      if (isThree) {
+        document.documentElement.style.setProperty("--sheet-width", getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-wide"));
+        document.documentElement.style.setProperty("--sheet-height", getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-wide"));
+      } else {
+        document.documentElement.style.setProperty("--sheet-width", getComputedStyle(document.documentElement).getPropertyValue("--sheet-width-phone"));
+        document.documentElement.style.setProperty("--sheet-height", getComputedStyle(document.documentElement).getPropertyValue("--sheet-height-phone"));
+      }
     }
     setTemplate(templateSelect.value);
     templateSelect.addEventListener("change", e => setTemplate(e.target.value));
 
-    // Parlay text style & positions
+    // Parlay text + layout controls
     const fontSelect = document.getElementById("parlay-font-select");
     const textColorInput = document.getElementById("parlay-text-color");
     const textSizeInput = document.getElementById("parlay-text-size");
@@ -762,14 +820,12 @@
       document.documentElement.style.setProperty("--parlay-text-size", textSizeInput.value + "px");
       document.documentElement.style.setProperty("--parlay-font", fontSelect.value);
     }
-
     function applyParlayTextPositions() {
       document.documentElement.style.setProperty("--t1-left", text1X.value + "%");
       document.documentElement.style.setProperty("--t1-bottom", text1Y.value + "%");
       document.documentElement.style.setProperty("--t2-left", text2X.value + "%");
       document.documentElement.style.setProperty("--t2-bottom", text2Y.value + "%");
     }
-
     [fontSelect, textColorInput, textSizeInput].forEach(el =>
       el.addEventListener("input", applyParlayTextStyle)
     );
@@ -779,7 +835,7 @@
     applyParlayTextStyle();
     applyParlayTextPositions();
 
-    // Parlay slip & player movement
+    // Slip + player sliders
     const slipX = document.getElementById("slip-x");
     const slipY = document.getElementById("slip-y");
     const slipWidth = document.getElementById("slip-width");
@@ -792,13 +848,11 @@
       document.documentElement.style.setProperty("--slip-top", slipY.value + "%");
       document.documentElement.style.setProperty("--slip-width", slipWidth.value + "%");
     }
-
     function applyPlayer() {
       document.documentElement.style.setProperty("--player-right", playerX.value + "%");
       document.documentElement.style.setProperty("--player-bottom", playerY.value + "%");
       document.documentElement.style.setProperty("--player-width", playerWidth.value + "%");
     }
-
     [slipX, slipY, slipWidth].forEach(el =>
       el.addEventListener("input", applySlip)
     );
@@ -808,71 +862,30 @@
     applySlip();
     applyPlayer();
 
-    // Download button with mobile-friendly behavior
+    // DOWNLOAD (desktop: file; mobile: overlay)
     const downloadBtn = document.getElementById("download-btn");
+    const hiddenLink = document.getElementById("hidden-download-link");
+    const overlay = document.getElementById("download-overlay");
+    const overlayImg = document.getElementById("download-preview");
+    const closeOverlay = document.getElementById("close-overlay");
+
+    closeOverlay.addEventListener("click", () => {
+      overlay.classList.remove("visible");
+    });
 
     downloadBtn.addEventListener("click", () => {
-      const mobile = isMobile();
-      let previewWin = null;
+      html2canvas(sheetEl, { scale: 3 }).then(canvas => {
+        const dataUrl = canvas.toDataURL("image/png");
 
-      // For mobile, open the tab *before* html2canvas so pop-up blockers allow it
-      if (mobile) {
-        previewWin = window.open("", "_blank");
-      }
-
-      html2canvas(sheetEl, { scale: 2, useCORS: true })
-        .then(canvas => {
-          const dataUrl = canvas.toDataURL("image/png");
-
-          if (!mobile) {
-            // Desktop: try direct download
-            try {
-              const link = document.createElement("a");
-              link.href = dataUrl;
-              link.download = "bet-sheet.png";
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            } catch (e) {
-              console.warn("Direct download failed; using preview tab only.", e);
-            }
-          }
-
-          // Mobile: fill the already-opened tab
-          if (mobile && previewWin) {
-            previewWin.document.write(
-              '<html><head><title>Save image</title></head>' +
-              '<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;">' +
-              '<img src="' + dataUrl + '" style="width:100%;height:auto;display:block;max-width:100%;" />' +
-              "</body></html>"
-            );
-            previewWin.document.close();
-            alert('In the new tab: long‑press the image and choose "Save Image".');
-            return;
-          }
-
-          // If mobile tab was blocked, or on desktop, open a preview tab as fallback
-          const win = window.open("", "_blank");
-          if (win) {
-            win.document.write(
-              '<html><head><title>Bet Sheet</title></head>' +
-              '<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;">' +
-              '<img src="' + dataUrl + '" style="width:100%;height:auto;display:block;max-width:100%;" />' +
-              "</body></html>"
-            );
-            win.document.close();
-            if (mobile) {
-              alert('In the new tab: long‑press the image and choose "Save Image".');
-            }
-          } else if (mobile) {
-            // Last-resort fallback
-            window.location.href = dataUrl;
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert("Could not create the image. If you used images from another website, try only using uploaded images.");
-        });
+        if (isMobile()) {
+          overlayImg.src = dataUrl;
+          overlay.classList.add("visible");
+        } else {
+          hiddenLink.href = dataUrl;
+          hiddenLink.download = "bet-sheet.png";
+          hiddenLink.click();
+        }
+      });
     });
   </script>
 </body>
