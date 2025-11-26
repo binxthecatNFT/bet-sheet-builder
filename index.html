@@ -11,16 +11,16 @@
   <style>
     :root {
       /* Wide canvas (3-player) */
-      --sheet-width-wide: 1200;
-      --sheet-height-wide: 675;
+      --sheet-width-wide: 1600;
+      --sheet-height-wide: 900;
 
-      /* Portrait canvas for parlay (4:5-ish) */
+      /* Phone canvas for parlay */
       --sheet-width-phone: 1080;
-      --sheet-height-phone: 1350;
+      --sheet-height-phone: 1920;
 
       /* Active canvas */
-      --sheet-width: 1200;
-      --sheet-height: 675;
+      --sheet-width: 1600;
+      --sheet-height: 900;
 
       --sheet-bg-main: #20274a;
       --text-main: #ffffff;
@@ -33,24 +33,22 @@
 
       /* Parlay text */
       --parlay-text-color: #ffffff;
-      --parlay-text-size: 34px;
-      --parlay-font: "Bebas Neue", system-ui, sans-serif;
+      --parlay-text-size: 30px;
+      --parlay-font: "Bebas Neue", sans-serif;
 
       --t1-left: 5%;   /* bottom text */
       --t1-bottom: 4%;
       --t2-left: 5%;   /* top text */
       --t2-bottom: 86%;
 
-      /* Parlay slip + player base widths + size (scale) */
+      /* Parlay slip + player defaults (phone-like) */
       --slip-left: 5%;
       --slip-top: 12%;
-      --slip-width: 32%;    /* base width */
-      --slip-scale: 1.3;    /* default = max */
+      --slip-scale: 1.3;       /* default: max size slider */
 
-      --player-right: 12%;
+      --player-left: 55%;
       --player-bottom: 0%;
-      --player-width: 34%;  /* base width */
-      --player-scale: 1.4;  /* default = max */
+      --player-scale: 1.3;     /* default: max size slider */
     }
 
     * { box-sizing: border-box; }
@@ -96,13 +94,6 @@
       gap: 6px;
       align-items: flex-end;
       min-width: 260px;
-    }
-
-    .step-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      opacity: 0.85;
     }
 
     select {
@@ -168,14 +159,6 @@
       font-size: 12px;
     }
 
-    .pill-group-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      opacity: 0.8;
-      margin-right: 4px;
-    }
-
     .btn-primary {
       border: none;
       padding: 8px 16px;
@@ -194,17 +177,17 @@
       box-shadow: 0 3px 8px rgba(0,0,0,0.7);
     }
 
-    .upload-btn {
-      border-radius: 999px;
+    .btn-secondary {
       border: 1px solid rgba(255,255,255,0.4);
-      background: rgba(0,0,0,0.85);
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.5);
       color: #fff;
-      padding: 4px 10px;
       font-size: 12px;
       cursor: pointer;
+      white-space: nowrap;
     }
-
-    .upload-btn:active { transform: translateY(1px); }
+    .btn-secondary:active { transform: translateY(1px); }
 
     .helper-note {
       max-width: 900px;
@@ -348,9 +331,7 @@
 
     .player-image-slot { height: 230px; }
 
-    .player-body {
-      padding: 10px 14px 14px;
-    }
+    .player-body { padding: 10px 14px 14px; }
 
     .player-name {
       font-family: "Bebas Neue", sans-serif;
@@ -377,7 +358,7 @@
     }
     .player-notes li + li { margin-top: 4px; }
 
-    /* PARLAY TEMPLATE */
+    /* PARLAY TEMPLATE (phone) */
     .template-parlay { position: relative; }
 
     .parlay-wrapper {
@@ -399,28 +380,30 @@
     }
     .parlay-bg-slot img { object-fit: cover; }
 
+    /* Proper phone-like slip box */
     .parlay-slip-slot {
       position: absolute;
       left: var(--slip-left);
       top: var(--slip-top);
-      width: var(--slip-width);
-      height: 82%;
+      width: 38%;
+      aspect-ratio: 9 / 19.5;  /* phone screenshot-ish */
       border-radius: 18px;
       background: #101010;
       box-shadow: 0 14px 30px rgba(0,0,0,0.8);
       z-index: 2;
       padding: 8px;
-      transform-origin: top left;
+      transform-origin: left top;
       transform: scale(var(--slip-scale));
     }
-    .parlay-slip-slot img { object-fit: contain; }
+    .parlay-slip-slot img { object-fit: cover; }
 
+    /* Player – can move all over */
     .parlay-player-slot {
       position: absolute;
-      right: var(--player-right);
+      left: var(--player-left);
       bottom: var(--player-bottom);
-      width: var(--player-width);
-      height: 95%;
+      width: 40%;
+      height: 100%;
       border-radius: 0;
       background: transparent;
       border: none;
@@ -492,31 +475,23 @@
         flex-direction: column;
         align-items: stretch;
       }
-      .app-header-controls {
-        align-items: stretch;
-      }
-      .control-row {
-        justify-content: flex-start;
-      }
-      .sheet-wrapper {
-        justify-content: center;
-      }
+      .app-header-controls { align-items: stretch; }
+      .control-row { justify-content: flex-start; }
+      .sheet-wrapper { justify-content: center; }
     }
   </style>
 </head>
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      <div class="step-label">1. Edit text & images on the canvas</div>
-      Tap any text to edit. Tap the dotted boxes with the big <strong>+</strong> to upload images.
+      Tap any text to edit. Tap the dotted boxes or use the upload buttons to add images.
     </div>
 
     <div class="app-header-controls">
-      <div class="step-label">2. Choose template & colors</div>
       <div class="control-row">
         <select id="template-select">
           <option value="three" selected>3-Player Props</option>
-          <option value="parlay">Parlay + Player (Portrait)</option>
+          <option value="parlay">Parlay + Player (Phone)</option>
         </select>
 
         <label class="pill">
@@ -528,40 +503,30 @@
           BG preset
           <select id="bg-template-select">
             <option value="none" selected>None / Upload</option>
-            <option value="stadium-blue">Stadium Blue</option>
-            <option value="stadium-green">Stadium Green</option>
-            <option value="dark-gradient">Dark Gradient</option>
+            <option value="stadium-blue">Stadium blue</option>
+            <option value="stadium-green">Stadium green</option>
+            <option value="dark-gradient">Dark gradient</option>
           </select>
         </label>
       </div>
 
       <div id="card-color-controls" class="control-row">
-        <span class="pill-group-label">3-player boxes</span>
         <label class="pill">
-          1
+          Box 1
           <input type="color" id="card1-color" value="#6b1118" />
         </label>
         <label class="pill">
-          2
+          Box 2
           <input type="color" id="card2-color" value="#6b3a11" />
         </label>
         <label class="pill">
-          3
+          Box 3
           <input type="color" id="card3-color" value="#0c2650" />
         </label>
       </div>
 
-      <!-- Parlay image upload buttons -->
-      <div id="parlay-upload-controls" class="control-row" style="display:none;">
-        <span class="pill-group-label">Images</span>
-        <button type="button" class="upload-btn" id="upload-bg-btn">Background</button>
-        <button type="button" class="upload-btn" id="upload-slip-btn">Parlay image</button>
-        <button type="button" class="upload-btn" id="upload-player-btn">Player PNG</button>
-      </div>
-
-      <!-- Parlay text controls -->
-      <div id="parlay-style-controls" class="control-row" style="display:none;">
-        <span class="pill-group-label">Text</span>
+      <!-- Parlay controls: text + layout + uploads -->
+      <div id="parlay-controls" class="control-row" style="display:none;">
         <label class="pill">
           Font
           <select id="parlay-font-select">
@@ -570,14 +535,17 @@
             <option value="system-ui, sans-serif">System</option>
           </select>
         </label>
+
         <label class="pill">
-          Color
+          Text color
           <input type="color" id="parlay-text-color" value="#ffffff" />
         </label>
+
         <label class="pill">
-          Size
-          <input type="number" id="parlay-text-size" min="18" max="60" value="34" />
+          Text size
+          <input type="number" id="parlay-text-size" min="18" max="60" value="30" />
         </label>
+
         <label class="pill">
           T1 X
           <input type="range" id="text1-x" min="0" max="100" value="5" />
@@ -586,6 +554,7 @@
           T1 Y
           <input type="range" id="text1-y" min="0" max="40" value="4" />
         </label>
+
         <label class="pill">
           T2 X
           <input type="range" id="text2-x" min="0" max="100" value="5" />
@@ -594,40 +563,41 @@
           T2 Y
           <input type="range" id="text2-y" min="0" max="90" value="86" />
         </label>
+
+        <label class="pill">
+          Slip X
+          <input type="range" id="slip-x" min="0" max="40" value="5" />
+        </label>
+        <label class="pill">
+          Slip Y
+          <input type="range" id="slip-y" min="0" max="40" value="12" />
+        </label>
+        <label class="pill">
+          Slip size
+          <input type="range" id="slip-size" min="70" max="130" value="130" />
+        </label>
+
+        <label class="pill">
+          Player X
+          <input type="range" id="player-x" min="0" max="70" value="55" />
+        </label>
+        <label class="pill">
+          Player Y
+          <input type="range" id="player-y" min="0" max="40" value="0" />
+        </label>
+        <label class="pill">
+          Player size
+          <input type="range" id="player-size" min="70" max="130" value="130" />
+        </label>
+
+        <!-- Upload buttons -->
+        <button type="button" id="bg-upload-btn" class="btn-secondary">BG image</button>
+        <button type="button" id="slip-upload-btn" class="btn-secondary">Parlay image</button>
+        <button type="button" id="player-upload-btn" class="btn-secondary">Player PNG</button>
+
+        <button type="button" id="reset-parlay" class="btn-secondary">Reset layout</button>
       </div>
 
-      <!-- Parlay layout controls -->
-      <div id="parlay-layout-controls" class="control-row" style="display:none;">
-        <span class="pill-group-label">Slip</span>
-        <label class="pill">
-          Left/Right
-          <input type="range" id="slip-x" min="0" max="30" value="5" />
-        </label>
-        <label class="pill">
-          Up/Down
-          <input type="range" id="slip-y" min="0" max="25" value="12" />
-        </label>
-        <label class="pill">
-          Size
-          <input type="range" id="slip-scale" min="0.7" max="1.3" step="0.02" value="1.3" />
-        </label>
-
-        <span class="pill-group-label">Player</span>
-        <label class="pill">
-          Left/Right
-          <input type="range" id="player-x" min="0" max="50" value="12" />
-        </label>
-        <label class="pill">
-          Up/Down
-          <input type="range" id="player-y" min="0" max="25" value="0" />
-        </label>
-        <label class="pill">
-          Size
-          <input type="range" id="player-scale" min="0.7" max="1.4" step="0.02" value="1.4" />
-        </label>
-      </div>
-
-      <div class="step-label">3. Download your graphic</div>
       <button id="download-btn" class="btn-primary">Download image</button>
     </div>
   </div>
@@ -770,7 +740,7 @@
 
     const sheetEl = document.getElementById("sheet");
 
-    // Image uploads (canvas dotted boxes)
+    // Image uploads (slots)
     document.querySelectorAll(".image-slot").forEach(slot => {
       const input = slot.querySelector("input[type='file']");
       const img = slot.querySelector("img");
@@ -790,20 +760,14 @@
       });
     });
 
-    // Grab parlay inputs for header upload buttons
-    const parlayBgInput = document.querySelector(".parlay-bg-slot input[type='file']");
-    const parlaySlipInput = document.querySelector(".parlay-slip-slot input[type='file']");
-    const parlayPlayerInput = document.querySelector(".parlay-player-slot input[type='file']");
+    // Quick handles for parlay file inputs (for top buttons)
+    const bgInput = document.querySelector(".parlay-bg-slot input[type='file']");
+    const slipInput = document.querySelector(".parlay-slip-slot input[type='file']");
+    const playerInput = document.querySelector(".parlay-player-slot input[type='file']");
 
-    document.getElementById("upload-bg-btn").addEventListener("click", () => {
-      if (parlayBgInput) parlayBgInput.click();
-    });
-    document.getElementById("upload-slip-btn").addEventListener("click", () => {
-      if (parlaySlipInput) parlaySlipInput.click();
-    });
-    document.getElementById("upload-player-btn").addEventListener("click", () => {
-      if (parlayPlayerInput) parlayPlayerInput.click();
-    });
+    document.getElementById("bg-upload-btn").addEventListener("click", () => bgInput && bgInput.click());
+    document.getElementById("slip-upload-btn").addEventListener("click", () => slipInput && slipInput.click());
+    document.getElementById("player-upload-btn").addEventListener("click", () => playerInput && playerInput.click());
 
     // BG color
     const bgPicker = document.getElementById("bg-color-picker");
@@ -849,14 +813,12 @@
     c2.addEventListener("input", e => setCardColor(2, e.target.value));
     c3.addEventListener("input", e => setCardColor(3, e.target.value));
 
-    // Template switching (also change canvas ratio & which controls show)
+    // Template switching
     const templateSelect = document.getElementById("template-select");
     const tplThree = document.getElementById("template-three");
     const tplParlay = document.getElementById("template-parlay");
     const cardControls = document.getElementById("card-color-controls");
-    const parlayTextControls = document.getElementById("parlay-style-controls");
-    const parlayLayoutControls = document.getElementById("parlay-layout-controls");
-    const parlayUploadControls = document.getElementById("parlay-upload-controls");
+    const parlayControls = document.getElementById("parlay-controls");
 
     function setTemplate(name) {
       const root = document.documentElement;
@@ -866,9 +828,7 @@
       tplThree.classList.toggle("active", isThree);
       tplParlay.classList.toggle("active", !isThree);
       cardControls.style.display = isThree ? "flex" : "none";
-      parlayTextControls.style.display = isThree ? "none" : "flex";
-      parlayLayoutControls.style.display = isThree ? "none" : "flex";
-      parlayUploadControls.style.display = isThree ? "none" : "flex";
+      parlayControls.style.display = isThree ? "none" : "flex";
 
       if (isThree) {
         root.style.setProperty("--sheet-width", styles.getPropertyValue("--sheet-width-wide"));
@@ -881,7 +841,7 @@
     setTemplate(templateSelect.value);
     templateSelect.addEventListener("change", e => setTemplate(e.target.value));
 
-    // Parlay text styling + positions
+    // Parlay text + layout controls
     const fontSelect = document.getElementById("parlay-font-select");
     const textColorInput = document.getElementById("parlay-text-color");
     const textSizeInput = document.getElementById("parlay-text-size");
@@ -910,32 +870,54 @@
     applyParlayTextStyle();
     applyParlayTextPositions();
 
-    // Slip + player position + scale
+    // Slip + player sliders
     const slipX = document.getElementById("slip-x");
     const slipY = document.getElementById("slip-y");
-    const slipScale = document.getElementById("slip-scale");
+    const slipSize = document.getElementById("slip-size");
     const playerX = document.getElementById("player-x");
     const playerY = document.getElementById("player-y");
-    const playerScale = document.getElementById("player-scale");
+    const playerSize = document.getElementById("player-size");
 
     function applySlip() {
       document.documentElement.style.setProperty("--slip-left", slipX.value + "%");
       document.documentElement.style.setProperty("--slip-top", slipY.value + "%");
-      document.documentElement.style.setProperty("--slip-scale", slipScale.value);
+      document.documentElement.style.setProperty("--slip-scale", slipSize.value / 100);
     }
     function applyPlayer() {
-      document.documentElement.style.setProperty("--player-right", playerX.value + "%");
+      document.documentElement.style.setProperty("--player-left", playerX.value + "%");
       document.documentElement.style.setProperty("--player-bottom", playerY.value + "%");
-      document.documentElement.style.setProperty("--player-scale", playerScale.value);
+      document.documentElement.style.setProperty("--player-scale", playerSize.value / 100);
     }
-    [slipX, slipY, slipScale].forEach(el =>
-      el.addEventListener("input", applySlip)
-    );
-    [playerX, playerY, playerScale].forEach(el =>
-      el.addEventListener("input", applyPlayer)
-    );
+    [slipX, slipY, slipSize].forEach(el => el.addEventListener("input", applySlip));
+    [playerX, playerY, playerSize].forEach(el => el.addEventListener("input", applyPlayer));
     applySlip();
     applyPlayer();
+
+    // Reset parlay to a good default layout
+    const resetParlayBtn = document.getElementById("reset-parlay");
+    function resetParlayLayout() {
+      fontSelect.value = "'Bebas Neue', sans-serif";
+      textColorInput.value = "#ffffff";
+      textSizeInput.value = 30;
+
+      text1X.value = 5;
+      text1Y.value = 4;
+      text2X.value = 5;
+      text2Y.value = 86;
+
+      slipX.value = 5;
+      slipY.value = 12;
+      slipSize.value = 130;
+      playerX.value = 55;
+      playerY.value = 0;
+      playerSize.value = 130;
+
+      applyParlayTextStyle();
+      applyParlayTextPositions();
+      applySlip();
+      applyPlayer();
+    }
+    resetParlayBtn.addEventListener("click", resetParlayLayout);
 
     // DOWNLOAD (desktop: file; mobile: overlay)
     const downloadBtn = document.getElementById("download-btn");
