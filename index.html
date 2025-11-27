@@ -14,11 +14,11 @@
       --sheet-width-wide: 1600;
       --sheet-height-wide: 900;
 
-      /* Phone canvas for parlay */
+      /* Phone canvas for parlay (portrait) */
       --sheet-width-phone: 1080;
       --sheet-height-phone: 1920;
 
-      /* Active canvas */
+      /* Active canvas (starts on 3-player) */
       --sheet-width: 1600;
       --sheet-height: 900;
 
@@ -33,7 +33,7 @@
 
       /* Parlay text */
       --parlay-text-color: #ffffff;
-      --parlay-text-size: 30px;
+      --parlay-text-size: 34px;
       --parlay-font: "Bebas Neue", sans-serif;
 
       --t1-left: 5%;
@@ -264,7 +264,7 @@
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: contain;   /* <-- key: no stretching */
+      object-fit: contain;  /* important: no stretching */
       opacity: 0;
       transition: opacity 0.2s;
       pointer-events: none;
@@ -349,7 +349,7 @@
     }
     .player-notes li + li { margin-top: 4px; }
 
-    /* PARLAY TEMPLATE (phone) */
+    /* PARLAY TEMPLATE */
     .template-parlay { position: relative; }
 
     .parlay-wrapper {
@@ -371,13 +371,13 @@
     }
     .parlay-bg-slot img { object-fit: cover; }
 
-    /* Phone-shaped slip container */
+    /* BIG parlay slip on the left */
     .parlay-slip-slot {
       position: absolute;
-      left: 5%;
+      left: 3%;
       top: 10%;
-      width: 40%;
-      height: 80%;
+      width: 46%;
+      height: 82%;
       border-radius: 18px;
       background: rgba(0,0,0,0.9);
       box-shadow: 0 14px 30px rgba(0,0,0,0.8);
@@ -385,15 +385,16 @@
       padding: 8px;
       transform-origin: center center;
       transform: translate(0px, 0px) scale(1);
-      touch-action: none; /* allows pointer gestures */
+      touch-action: none;
     }
 
+    /* BIG player on the right */
     .parlay-player-slot {
       position: absolute;
-      left: 55%;
-      bottom: 0;
-      width: 40%;
-      height: 100%;
+      right: 0;
+      bottom: -3%;
+      width: 52%;
+      height: 110%;
       border-radius: 0;
       background: transparent;
       border: none;
@@ -475,8 +476,8 @@
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      Tap text to edit. Use the dotted boxes or the buttons to upload images.
-      On the parlay template: <strong>drag with one finger</strong> and <strong>pinch with two</strong> on the parlay slip or player.
+      Tap text to edit. Use the dotted boxes or the buttons to upload images.  
+      On the parlay template: <strong>drag</strong> the parlay or player with one finger, <strong>pinch</strong with two to resize.
     </div>
 
     <div class="app-header-controls">
@@ -537,7 +538,7 @@
 
           <label class="pill">
             Text size
-            <input type="number" id="parlay-text-size" min="18" max="60" value="30" />
+            <input type="number" id="parlay-text-size" min="18" max="60" value="34" />
           </label>
         </div>
 
@@ -731,7 +732,7 @@
       });
     });
 
-    // Map top buttons to parlay inputs
+    // Top upload buttons -> parlay inputs
     const bgInput = document.querySelector(".parlay-bg-slot input[type='file']");
     const slipInput = document.querySelector(".parlay-slip-slot input[type='file']");
     const playerInput = document.querySelector(".parlay-player-slot input[type='file']");
@@ -841,45 +842,38 @@
     applyParlayTextPositions();
 
     /* ---------- DRAG + PINCH (SLIP & PLAYER) ---------- */
-    function makeDraggableZoomable(el, opts = {}) {
-      if (!el) return;
-      const state = {
-        x: 0,
-        y: 0,
-        scale: 1
-      };
-      const minScale = opts.minScale || 0.6;
-      const maxScale = opts.maxScale || 1.6;
+    function makeTransformable(el, options = {}) {
+      const minScale = options.minScale || 0.5;
+      const maxScale = options.maxScale || 2.0;
+      const defaultScale = options.initialScale || 1;
+      let pointers = new Map();
+      let tx = options.initialX || 0;
+      let ty = options.initialY || 0;
+      let scale = defaultScale;
+      let dragStartX = 0, dragStartY = 0, startTx = 0, startTy = 0;
+      let pinchStartDist = 0, startScale = defaultScale;
 
-      const pointers = new Map();
-      let startState = null;
-      let startCenter = null;
-      let startDistance = 0;
-
-      function updateTransform() {
-        el.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+      function update() {
+        el.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
       }
-
-      el.style.transformOrigin = opts.origin || "center center";
+      update();
       el.style.touchAction = "none";
-      updateTransform();
 
       el.addEventListener("pointerdown", e => {
         el.setPointerCapture(e.pointerId);
         pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
         if (pointers.size === 1) {
-          // drag start
-          startState = { ...state };
-          startCenter = { x: e.clientX, y: e.clientY };
-          startDistance = 0;
+          const p = pointers.get(e.pointerId);
+          dragStartX = p.x;
+          dragStartY = p.y;
+          startTx = tx;
+          startTy = ty;
+          pinchStartDist = 0;
         } else if (pointers.size === 2) {
-          // pinch start
           const pts = Array.from(pointers.values());
-          startState = { ...state };
-          const dx = pts[0].x - pts[1].x;
-          const dy = pts[0].y - pts[1].y;
-          startDistance = Math.hypot(dx, dy);
+          pinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+          startScale = scale;
         }
       });
 
@@ -887,23 +881,22 @@
         if (!pointers.has(e.pointerId)) return;
         pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-        if (pointers.size === 1 && startCenter) {
-          // drag
-          const p = pointers.get(e.pointerId);
-          const dx = p.x - startCenter.x;
-          const dy = p.y - startCenter.y;
-          state.x = startState.x + dx;
-          state.y = startState.y + dy;
-          updateTransform();
-        } else if (pointers.size >= 2 && startDistance > 0) {
-          // pinch zoom
+        if (pointers.size === 1 && pinchStartDist === 0) {
+          const p = Array.from(pointers.values())[0];
+          const dx = p.x - dragStartX;
+          const dy = p.y - dragStartY;
+          tx = startTx + dx;
+          ty = startTy + dy;
+          update();
+        } else if (pointers.size >= 2) {
           const pts = Array.from(pointers.values());
-          const dx = pts[0].x - pts[1].x;
-          const dy = pts[0].y - pts[1].y;
-          const dist = Math.hypot(dx, dy);
-          let factor = dist / startDistance;
-          state.scale = Math.max(minScale, Math.min(maxScale, startState.scale * factor));
-          updateTransform();
+          const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+          if (pinchStartDist > 0) {
+            let factor = dist / pinchStartDist;
+            scale = startScale * factor;
+            scale = Math.max(minScale, Math.min(maxScale, scale));
+            update();
+          }
         }
       });
 
@@ -911,51 +904,61 @@
         if (pointers.has(e.pointerId)) {
           pointers.delete(e.pointerId);
         }
-        if (pointers.size === 0) {
-          startCenter = null;
-          startDistance = 0;
-          startState = null;
+        if (pointers.size < 2) {
+          pinchStartDist = 0;
         }
       }
 
-      el.addEventListener("pointerup", endPointer);
-      el.addEventListener("pointercancel", endPointer);
+      ["pointerup", "pointercancel", "pointerleave", "pointerout"].forEach(type => {
+        el.addEventListener(type, endPointer);
+      });
 
-      // Optional: mouse wheel zoom on desktop
+      // Optional wheel zoom on desktop
       el.addEventListener("wheel", e => {
         e.preventDefault();
         const delta = -e.deltaY * 0.001;
-        state.scale = Math.max(minScale, Math.min(maxScale, state.scale * (1 + delta)));
-        updateTransform();
+        scale = Math.max(minScale, Math.min(maxScale, scale * (1 + delta)));
+        update();
       }, { passive: false });
 
-      // Reset helper
-      return () => {
-        state.x = 0;
-        state.y = 0;
-        state.scale = 1;
-        updateTransform();
+      return {
+        reset() {
+          tx = options.initialX || 0;
+          ty = options.initialY || 0;
+          scale = defaultScale;
+          update();
+        }
       };
     }
 
     const slipSlot = document.querySelector(".parlay-slip-slot");
     const playerSlot = document.querySelector(".parlay-player-slot");
-    const resetSlipTransform = makeDraggableZoomable(slipSlot, { minScale: 0.7, maxScale: 1.4 });
-    const resetPlayerTransform = makeDraggableZoomable(playerSlot, { minScale: 0.7, maxScale: 1.6, origin: "bottom center" });
 
-    // Reset button resets text + slip/player transforms
+    const slipTransform = makeTransformable(slipSlot, {
+      minScale: 0.7,
+      maxScale: 1.6,
+      initialScale: 1.15
+    });
+
+    const playerTransform = makeTransformable(playerSlot, {
+      minScale: 0.7,
+      maxScale: 1.8,
+      initialScale: 1.25
+    });
+
+    // Reset button
     document.getElementById("reset-parlay").addEventListener("click", () => {
       fontSelect.value = "'Bebas Neue', sans-serif";
       textColorInput.value = "#ffffff";
-      textSizeInput.value = 30;
+      textSizeInput.value = 34;
       text1X.value = 5;
       text1Y.value = 4;
       text2X.value = 5;
       text2Y.value = 86;
       applyParlayTextStyle();
       applyParlayTextPositions();
-      if (resetSlipTransform) resetSlipTransform();
-      if (resetPlayerTransform) resetPlayerTransform();
+      slipTransform.reset();
+      playerTransform.reset();
     });
 
     /* ---------- DOWNLOAD ---------- */
