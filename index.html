@@ -2,965 +2,483 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bet Sheet Builder</title>
+  <title>Parlay + Player Builder (Phone)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-
+  <!-- Bebas font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+    rel="stylesheet"
+  />
   <style>
     :root {
-      /* Wide canvas (3-player) */
-      --sheet-width-wide: 1600;
-      --sheet-height-wide: 900;
-
-      /* Phone canvas for parlay (4:5 portrait like a photo / IG post) */
-      --sheet-width-phone: 1080;
-      --sheet-height-phone: 1350;
-
-      /* Active canvas */
-      --sheet-width: 1600;
-      --sheet-height: 900;
-
-      --sheet-bg-main: #20274a;
-      --text-main: #ffffff;
-      --text-muted: #c2cade;
-
-      /* 3-player colors */
-      --card1-color: #6b1118;
-      --card2-color: #6b3a11;
-      --card3-color: #0c2650;
-
-      /* Parlay text */
-      --parlay-text-color: #ffffff;
-      --parlay-text-size: 34px;
-      --parlay-font: "Bebas Neue", sans-serif;
-
-      --t1-left: 6%;
-      --t1-bottom: 4%;
-      --t2-left: 6%;
-      --t2-bottom: 86%;
-
-      /* Parlay slip box (% of sheet) */
-      --slip-left: 6;
-      --slip-top: 14;
-      --slip-width: 44;  /* bigger default */
-
-      /* Player box (% of sheet) */
-      --player-left: 50;
-      --player-bottom: 0;
-      --player-width: 44;
+      --bg: #05081a;
+      --panel: #0b1023;
+      --panel-soft: #141c3a;
+      --accent: #ff6b3d;
+      --accent-soft: #ff9c6d;
+      --text: #f5f5f5;
+      --muted: #94a3b8;
+      --radius-lg: 16px;
+      --radius-full: 999px;
     }
 
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      max-width: 100vw;
-      overflow-x: hidden;
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      padding: 12px;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top, var(--sheet-bg-main), #050816 60%);
-      color: var(--text-main);
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #182342 0, var(--bg) 55%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 12px;
+    }
+
+    header {
+      font-family: "Bebas Neue", system-ui, sans-serif;
+      letter-spacing: 0.08em;
+      font-size: 24px;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 8px 0;
+    }
+
+    .panel {
+      background: radial-gradient(circle at top left, #1c2650, var(--panel));
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
 
-    .app-header {
-      width: 100%;
-      max-width: 900px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .app-header-left {
-      flex: 1 1 220px;
-      min-width: 220px;
-    }
-
-    .app-header-controls {
+    .field {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      align-items: flex-end;
-      min-width: 260px;
+      gap: 4px;
+      font-size: 12px;
     }
 
-    .control-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: flex-end;
-      align-items: center;
+    .field label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 11px;
     }
 
-    select {
-      background: rgba(0,0,0,0.85);
-      color: #fff;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.3);
-      padding: 4px 10px;
+    input[type="text"],
+    input[type="number"],
+    input[type="color"] {
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      padding: 6px 8px;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
       font-size: 13px;
       outline: none;
     }
 
-    .pill {
-      font-size: 12px;
+    input[type="text"]::placeholder {
+      color: #64748b;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .file-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .file-button {
+      position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.2);
-      white-space: nowrap;
-    }
-
-    .pill input[type="color"] {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      background: transparent;
-    }
-
-    .pill input[type="range"] {
-      width: 80px;
-    }
-
-    .pill input[type="number"] {
-      width: 52px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      padding: 2px 4px;
-      font-size: 12px;
-    }
-
-    .pill select {
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(0,0,0,0.8);
-      color: #fff;
-      padding: 2px 6px;
-      font-size: 12px;
-    }
-
-    .btn-primary {
-      border: none;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #ff8a3a, #ff4f58);
-      color: #fff;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.5);
-      white-space: nowrap;
-    }
-
-    .btn-primary:active {
-      transform: translateY(1px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.7);
-    }
-
-    .btn-secondary {
-      border: 1px solid rgba(255,255,255,0.4);
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.5);
-      color: #fff;
-      font-size: 12px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .btn-secondary:active { transform: translateY(1px); }
-
-    .helper-note {
-      max-width: 900px;
-      width: 100%;
-      text-align: right;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .sheet-wrapper {
-      width: 100%;
-      display: flex;
       justify-content: center;
-      overflow-x: auto;
-      padding-bottom: 12px;
-    }
-
-    #sheet {
-      width: 100%;
-      max-width: 900px;
-      aspect-ratio: var(--sheet-width) / var(--sheet-height);
-      border-radius: 20px;
-      background: radial-gradient(circle at top, var(--sheet-bg-main), #050816 60%);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .template {
-      width: 100%;
-      height: 100%;
-      display: none;
-    }
-    .template.active { display: block; }
-
-    /* Generic image slots */
-    .image-slot {
-      position: relative;
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      background: var(--panel-soft);
+      color: var(--text);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       cursor: pointer;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(148, 163, 184, 0.25);
     }
 
-    .image-slot::before {
-      content: "";
-      position: absolute;
-      inset: 14%;
-      border-radius: 12px;
-      border: 2px dashed rgba(255,255,255,0.85);
-      pointer-events: none;
+    .file-button:hover {
+      border-color: var(--accent-soft);
     }
 
-    .upload-ui {
+    .file-button input[type="file"] {
       position: absolute;
       inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .preview-wrapper {
+      background: #000;
+      border-radius: var(--radius-lg);
+      padding: 8px;
+      margin-top: 6px;
+    }
+
+    /* The important bit: preview canvas uses the same aspect as export,
+       no cropping, just scaled down */
+    #previewCanvas {
+      display: block;
+      width: 100%;
+      height: auto; /* keeps aspect ratio */
+      border-radius: 12px;
+      background: #020617;
+    }
+
+    .actions {
+      margin-top: 12px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
       gap: 6px;
-      text-align: center;
     }
 
-    .upload-ui .plus {
-      font-size: 60px;
-      color: #fff;
-      text-shadow: 0 0 16px rgba(0,0,0,0.9);
-    }
-
-    .upload-ui .label {
-      font-size: 11px;
+    #downloadBtn {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+      color: #0f172a;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: rgba(255,255,255,0.95);
-    }
-
-    .image-slot img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;  /* no stretching */
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-    }
-
-    .image-slot.has-image::before { display: none; }
-    .image-slot.has-image .upload-ui { display: none; }
-    .image-slot.has-image img { opacity: 1; }
-
-    .image-slot input[type="file"] { display: none; }
-
-    /* 3-PLAYER TEMPLATE */
-    .sheet-header {
-      text-align: center;
-      margin-bottom: 18px;
-      text-transform: uppercase;
-    }
-
-    .sheet-subtitle {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 30px;
-      letter-spacing: 2px;
-    }
-
-    .sheet-title {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 68px;
-      letter-spacing: 3px;
-      margin: 4px 0;
-    }
-
-    .sheet-kicker {
-      font-size: 22px;
-      color: var(--text-muted);
-    }
-
-    .player-grid {
-      display: flex;
-      gap: 16px;
-      height: calc(100% - 110px);
-    }
-
-    .player-card {
-      flex: 1;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.15);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .player-card[data-card="1"] { background: linear-gradient(var(--card1-color), #000); }
-    .player-card[data-card="2"] { background: linear-gradient(var(--card2-color), #000); }
-    .player-card[data-card="3"] { background: linear-gradient(var(--card3-color), #000); }
-
-    .player-image-slot { height: 230px; }
-
-    .player-body { padding: 10px 14px 14px; }
-
-    .player-name {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 28px;
-      text-align: center;
-      margin-bottom: 6px;
-      letter-spacing: 2px;
-    }
-
-    .player-bet {
-      text-align: center;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-weight: 700;
-      margin: 0 auto 10px;
-      width: 90%;
-      background: rgba(0,0,0,0.45);
-    }
-
-    .player-notes {
-      font-size: 14px;
-      margin-left: 18px;
-      padding-left: 8px;
-    }
-    .player-notes li + li { margin-top: 4px; }
-
-    /* PARLAY TEMPLATE (phone) */
-    .template-parlay { position: relative; }
-
-    .parlay-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: 18px;
-      overflow: hidden;
-    }
-
-    .template-parlay .image-slot { background: transparent; }
-
-    .parlay-bg-slot {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      background-size: cover;
-      background-position: center;
-    }
-    .parlay-bg-slot img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.85);
-    }
-
-    /* Big parlay slip box on left, fixed aspect ratio */
-    .parlay-slip-slot {
-      position: absolute;
-      left: calc(var(--slip-left) * 1%);
-      top: calc(var(--slip-top) * 1%);
-      width: calc(var(--slip-width) * 1%);
-      aspect-ratio: 9 / 19.5;  /* phone-ish screenshot shape */
-      border-radius: 18px;
-      background: #101010;
-      box-shadow: 0 14px 30px rgba(0,0,0,0.8);
-      z-index: 2;
-      padding: 8px;
-    }
-    .parlay-slip-slot img { object-fit: contain; }
-
-    /* Big player box on right, fixed aspect ratio */
-    .parlay-player-slot {
-      position: absolute;
-      left: calc(var(--player-left) * 1%);
-      bottom: calc(var(--player-bottom) * 1%);
-      width: calc(var(--player-width) * 1%);
-      aspect-ratio: 2 / 3; /* tall player */
-      border-radius: 0;
-      background: transparent;
-      border: none;
-      z-index: 4;
-      overflow: visible;
-    }
-    .parlay-player-slot img { object-fit: contain; }
-
-    .parlay-bottom-text {
-      position: absolute;
-      font-family: var(--parlay-font);
-      font-size: var(--parlay-text-size);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--parlay-text-color);
-      text-shadow: 0 2px 8px rgba(0,0,0,0.9);
-      white-space: nowrap;
-      z-index: 5;
-    }
-    .parlay-text-1 { left: var(--t1-left); bottom: var(--t1-bottom); }
-    .parlay-text-2 { left: var(--t2-left); bottom: var(--t2-bottom); }
-
-    .editable { outline: none; cursor: text; }
-    .editable:empty::before {
-      content: attr(data-placeholder);
-      opacity: 0.4;
-    }
-
-    /* DOWNLOAD OVERLAY (mobiles) */
-    #download-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.92);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      z-index: 9999;
-      padding: 16px;
-      text-align: center;
-    }
-    #download-overlay.visible { display: flex; }
-    #download-overlay img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 0 18px rgba(0,0,0,0.8);
-      margin-bottom: 12px;
-    }
-    #download-overlay p {
-      color: #f5f5f5;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-    #download-overlay button {
-      border: none;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: #333;
-      color: #fff;
+      padding: 12px;
       font-size: 13px;
       cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
     }
 
-    @media (max-width: 900px) {
-      .app-header {
-        max-width: 100%;
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .app-header-controls { align-items: stretch; }
-      .control-row { justify-content: flex-start; }
-      .sheet-wrapper { justify-content: center; }
+    #downloadBtn:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
-  <div class="app-header">
-    <div class="app-header-left">
-      Tap text to edit. Tap dotted boxes or buttons to upload images.  
-      Parlay template exports as a **phone-shaped 4:5 image**. Photos will not stretch.
-    </div>
+  <div class="app">
+    <header>Parlay + Player (Phone)</header>
 
-    <div class="app-header-controls">
-      <div class="control-row">
-        <select id="template-select">
-          <option value="three" selected>3-Player Props</option>
-          <option value="parlay">Parlay + Player (Phone)</option>
-        </select>
-
-        <label class="pill">
-          BG
-          <input type="color" id="bg-color-picker" value="#20274a" />
-        </label>
-
-        <label class="pill">
-          BG preset
-          <select id="bg-template-select">
-            <option value="none" selected>None / Upload</option>
-            <option value="stadium-blue">Stadium blue</option>
-            <option value="stadium-green">Stadium green</option>
-            <option value="dark-gradient">Dark gradient</option>
-          </select>
-        </label>
-      </div>
-
-      <!-- 3-player colors -->
-      <div id="card-color-controls" class="control-row">
-        <label class="pill">
-          Box 1
-          <input type="color" id="card1-color" value="#6b1118" />
-        </label>
-        <label class="pill">
-          Box 2
-          <input type="color" id="card2-color" value="#6b3a11" />
-        </label>
-        <label class="pill">
-          Box 3
-          <input type="color" id="card3-color" value="#0c2650" />
-        </label>
-      </div>
-
-      <!-- Parlay controls -->
-      <div id="parlay-controls" style="display:none; flex-direction:column; gap:4px; align-items:flex-end;">
-        <div class="control-row">
-          <label class="pill">
-            Font
-            <select id="parlay-font-select">
-              <option value="'Bebas Neue', sans-serif">Bebas</option>
-              <option value="'Inter', sans-serif">Inter</option>
-              <option value="system-ui, sans-serif">System</option>
-            </select>
-          </label>
-
-          <label class="pill">
-            Text color
-            <input type="color" id="parlay-text-color" value="#ffffff" />
-          </label>
-
-          <label class="pill">
-            Text size
-            <input type="number" id="parlay-text-size" min="18" max="60" value="34" />
-          </label>
+    <!-- TEXT CONTROLS -->
+    <section class="panel">
+      <div class="panel-title">Text</div>
+      <div class="grid">
+        <div class="field">
+          <label for="text1">Top text</label>
+          <input id="text1" type="text" placeholder="@LETSCASHSLIPS" />
         </div>
-
-        <div class="control-row">
-          <label class="pill">
-            T1 X
-            <input type="range" id="text1-x" min="0" max="100" value="6" />
-          </label>
-          <label class="pill">
-            T1 Y
-            <input type="range" id="text1-y" min="0" max="40" value="4" />
-          </label>
-          <label class="pill">
-            T2 X
-            <input type="range" id="text2-x" min="0" max="100" value="6" />
-          </label>
-          <label class="pill">
-            T2 Y
-            <input type="range" id="text2-y" min="0" max="90" value="86" />
-          </label>
+        <div class="field">
+          <label for="text2">Bottom text</label>
+          <input id="text2" type="text" placeholder="WEEK 13 PARLAYS" />
         </div>
-
-        <!-- Slip + Player layout sliders -->
-        <div class="control-row">
-          <label class="pill">
-            Slip X
-            <input type="range" id="slip-x" min="0" max="30" value="6" />
-          </label>
-          <label class="pill">
-            Slip Y
-            <input type="range" id="slip-y" min="0" max="40" value="14" />
-          </label>
-          <label class="pill">
-            Slip width
-            <input type="range" id="slip-width" min="30" max="60" value="44" />
-          </label>
+        <div class="field">
+          <label for="textColor">Text color</label>
+          <input id="textColor" type="color" />
         </div>
-
-        <div class="control-row">
-          <label class="pill">
-            Player X
-            <input type="range" id="player-x" min="30" max="80" value="50" />
-          </label>
-          <label class="pill">
-            Player Y
-            <input type="range" id="player-y" min="0" max="30" value="0" />
-          </label>
-          <label class="pill">
-            Player width
-            <input type="range" id="player-width" min="30" max="60" value="44" />
-          </label>
-        </div>
-
-        <!-- Upload buttons -->
-        <div class="control-row">
-          <button type="button" id="bg-upload-btn" class="btn-secondary">BG image</button>
-          <button type="button" id="slip-upload-btn" class="btn-secondary">Parlay image</button>
-          <button type="button" id="player-upload-btn" class="btn-secondary">Player PNG</button>
-          <button type="button" id="reset-parlay" class="btn-secondary">Reset layout</button>
+        <div class="field">
+          <label for="textSize">Text size</label>
+          <input id="textSize" type="number" min="20" max="160" />
         </div>
       </div>
 
-      <button id="download-btn" class="btn-primary">Download image</button>
-    </div>
+      <div class="grid" style="margin-top:8px;">
+        <div class="field">
+          <label for="t1x">T1 X</label>
+          <input id="t1x" type="range" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label for="t1y">T1 Y</label>
+          <input id="t1y" type="range" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label for="t2x">T2 X</label>
+          <input id="t2x" type="range" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label for="t2y">T2 Y</label>
+          <input id="t2y" type="range" min="0" max="100" step="0.5" />
+        </div>
+      </div>
+    </section>
+
+    <!-- IMAGE CONTROLS -->
+    <section class="panel">
+      <div class="panel-title">Images</div>
+      <div class="file-buttons">
+        <label class="file-button">
+          BG image
+          <input id="bgFile" type="file" accept="image/*" />
+        </label>
+        <label class="file-button">
+          Parlay image
+          <input id="slipFile" type="file" accept="image/*" />
+        </label>
+        <label class="file-button">
+          Player PNG
+          <input id="playerFile" type="file" accept="image/*" />
+        </label>
+      </div>
+
+      <div class="grid" style="margin-top:8px;">
+        <div class="field">
+          <label for="slipX">Slip X</label>
+          <input id="slipX" type="range" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label for="slipY">Slip Y</label>
+          <input id="slipY" type="range" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label for="slipWidth">Slip width %</label>
+          <input id="slipWidth" type="range" min="10" max="100" step="1" />
+        </div>
+        <div class="field">
+          <label for="playerWidth">Player width %</label>
+          <input id="playerWidth" type="range" min="10" max="100" step="1" />
+        </div>
+        <div class="field">
+          <label for="playerX">Player X</label>
+          <input id="playerX" type="range" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label for="playerY">Player Y</label>
+          <input id="playerY" type="range" min="0" max="100" step="0.5" />
+        </div>
+      </div>
+    </section>
+
+    <!-- PREVIEW -->
+    <section class="panel">
+      <div class="panel-title">Preview (same as Download)</div>
+      <div class="preview-wrapper">
+        <!-- This canvas is BOTH the live preview and the exported image -->
+        <canvas id="previewCanvas" width="1080" height="1920"></canvas>
+      </div>
+
+      <div class="actions">
+        <button id="downloadBtn">Download image</button>
+        <p class="hint">
+          On iPhone/Android: after Download, long‑press the image in your Photos
+          and choose “Save Image”.
+        </p>
+      </div>
+    </section>
   </div>
 
-  <div class="helper-note">
-    On iPhone/Android: after Download, long‑press the image and choose “Save Image”.
-  </div>
-
-  <div class="sheet-wrapper">
-    <div id="sheet">
-      <!-- 3-PLAYER TEMPLATE -->
-      <div id="template-three" class="template active">
-        <div class="sheet-header">
-          <div class="sheet-subtitle editable" contenteditable="true">CASHIN SLIP'S</div>
-          <div class="sheet-title editable" contenteditable="true">NBA HIT RATES</div>
-          <div class="sheet-kicker editable" contenteditable="true">3/3 PLAYER PROPS</div>
-        </div>
-
-        <div class="player-grid">
-          <div class="player-card" data-card="1">
-            <div class="image-slot player-image-slot">
-              <div class="upload-ui">
-                <span class="plus">+</span>
-                <span class="label">Upload player image</span>
-              </div>
-              <img alt="Player 1" />
-              <input type="file" accept="image/*" />
-            </div>
-            <div class="player-body">
-              <div class="player-name editable" contenteditable="true">PLAYER ONE</div>
-              <div class="player-bet editable" contenteditable="true">Over 11.5 Points -119</div>
-              <ul class="player-notes">
-                <li class="editable" contenteditable="true">Hit 5 of last 5</li>
-                <li class="editable" contenteditable="true">Favorable matchup</li>
-                <li class="editable" contenteditable="true">Playing 30+ minutes</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="player-card" data-card="2">
-            <div class="image-slot player-image-slot">
-              <div class="upload-ui">
-                <span class="plus">+</span>
-                <span class="label">Upload player image</span>
-              </div>
-              <img alt="Player 2" />
-              <input type="file" accept="image/*" />
-            </div>
-            <div class="player-body">
-              <div class="player-name editable" contenteditable="true">PLAYER TWO</div>
-              <div class="player-bet editable" contenteditable="true">Over 9.5 Points -113</div>
-              <ul class="player-notes">
-                <li class="editable" contenteditable="true">High usage lately</li>
-                <li class="editable" contenteditable="true">Weak defense vs position</li>
-                <li class="editable" contenteditable="true">Solid minutes floor</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="player-card" data-card="3">
-            <div class="image-slot player-image-slot">
-              <div class="upload-ui">
-                <span class="plus">+</span>
-                <span class="label">Upload player image</span>
-              </div>
-              <img alt="Player 3" />
-              <input type="file" accept="image/*" />
-            </div>
-            <div class="player-body">
-              <div class="player-name editable" contenteditable="true">PLAYER THREE</div>
-              <div class="player-bet editable" contenteditable="true">Over 14.5 Points -105</div>
-              <ul class="player-notes">
-                <li class="editable" contenteditable="true">High shot volume</li>
-                <li class="editable" contenteditable="true">30+ minutes nightly</li>
-                <li class="editable" contenteditable="true">Great matchup</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PARLAY TEMPLATE -->
-      <div id="template-parlay" class="template template-parlay">
-        <div class="parlay-wrapper">
-          <!-- Background -->
-          <div class="image-slot parlay-bg-slot">
-            <div class="upload-ui">
-              <span class="plus">+</span>
-              <span class="label">Upload background image</span>
-            </div>
-            <img alt="Background" />
-            <input type="file" accept="image/*" />
-          </div>
-
-          <!-- Slip -->
-          <div class="image-slot parlay-slip-slot">
-            <div class="upload-ui">
-              <span class="plus">+</span>
-              <span class="label">Upload parlay image</span>
-            </div>
-            <img alt="Parlay slip" />
-            <input type="file" accept="image/*" />
-          </div>
-
-          <!-- Player -->
-          <div class="image-slot parlay-player-slot">
-            <div class="upload-ui">
-              <span class="plus">+</span>
-              <span class="label">Upload player PNG</span>
-            </div>
-            <img alt="Player" />
-            <input type="file" accept="image/*" />
-          </div>
-
-          <div class="parlay-bottom-text parlay-text-1 editable" contenteditable="true">
-            WEEK 13 PARLAYS
-          </div>
-          <div class="parlay-bottom-text parlay-text-2 editable" contenteditable="true">
-            @LETSCASHSLIPS
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Desktop download anchor + mobile overlay -->
-  <a id="hidden-download-link" style="display:none;"></a>
-
-  <div id="download-overlay">
-    <img id="download-preview" alt="Bet sheet preview" />
-    <p>On iPhone/Android: long‑press this image and choose “Save Image”.</p>
-    <button id="close-overlay">Close</button>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    function isMobile() {
-      return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // ------- STATE SETUP -------
+    const canvas = document.getElementById("previewCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const state = {
+      text1: "@LETSCASHSLIPS",
+      text2: "WEEK 13 PARLAYS",
+      textColor: "#ffffff",
+      textSize: 80,
+
+      t1x: 6,
+      t1y: 5,
+      t2x: 6,
+      t2y: 80,
+
+      slipX: 5,
+      slipY: 20,
+      slipWidth: 52,
+
+      playerX: 56,
+      playerY: 22,
+      playerWidth: 46,
+    };
+
+    const images = {
+      bg: { img: new Image(), loaded: false },
+      slip: { img: new Image(), loaded: false },
+      player: { img: new Image(), loaded: false },
+    };
+
+    // ------- DRAW FUNCTION (used for preview AND final download) -------
+    function draw() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Clear and base background
+      ctx.clearRect(0, 0, w, h);
+      const grd = ctx.createLinearGradient(0, 0, 0, h);
+      grd.addColorStop(0, "#020617");
+      grd.addColorStop(1, "#020617");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, w, h);
+
+      // BG image stretched to fill canvas
+      if (images.bg.loaded) {
+        ctx.drawImage(images.bg.img, 0, 0, w, h);
+      }
+
+      // Parlay slip
+      if (images.slip.loaded) {
+        const slipW = (state.slipWidth / 100) * w;
+        const ratio = images.slip.img.height / images.slip.img.width;
+        const slipH = slipW * ratio;
+        const slipX = (state.slipX / 100) * w;
+        const slipY = (state.slipY / 100) * h;
+        ctx.drawImage(images.slip.img, slipX, slipY, slipW, slipH);
+      }
+
+      // Player PNG
+      if (images.player.loaded) {
+        const playerW = (state.playerWidth / 100) * w;
+        const ratio = images.player.img.height / images.player.img.width;
+        const playerH = playerW * ratio;
+        const playerX = (state.playerX / 100) * w;
+        const playerY = (state.playerY / 100) * h;
+        ctx.drawImage(images.player.img, playerX, playerY, playerW, playerH);
+      }
+
+      // Text
+      ctx.fillStyle = state.textColor;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      ctx.font = `${state.textSize}px 'Bebas Neue', sans-serif`;
+      ctx.fillText(
+        state.text1,
+        (state.t1x / 100) * w,
+        (state.t1y / 100) * h
+      );
+
+      ctx.font = `${state.textSize * 0.8}px 'Bebas Neue', sans-serif`;
+      ctx.fillText(
+        state.text2,
+        (state.t2x / 100) * w,
+        (state.t2y / 100) * h
+      );
     }
 
-    const sheetEl = document.getElementById("sheet");
-    const root = document.documentElement;
+    // ------- HELPERS -------
+    function bindText(id, key) {
+      const el = document.getElementById(id);
+      el.value = state[key];
+      el.addEventListener("input", () => {
+        state[key] = el.value;
+        draw();
+      });
+    }
 
-    /* ---------- IMAGE UPLOADS ---------- */
-    document.querySelectorAll(".image-slot").forEach(slot => {
-      const input = slot.querySelector("input[type='file']");
-      const img = slot.querySelector("img");
-      if (!input || !img) return;
+    function bindRange(id, key) {
+      const el = document.getElementById(id);
+      el.value = state[key];
+      el.addEventListener("input", () => {
+        state[key] = parseFloat(el.value);
+        draw();
+      });
+    }
 
-      slot.addEventListener("click", () => input.click());
+    function handleFileInput(inputId, imageKey) {
+      const input = document.getElementById(inputId);
+      const obj = images[imageKey];
 
-      input.addEventListener("change", e => {
+      input.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = ev => {
-          img.src = ev.target.result;
-          slot.classList.add("has-image");
+        reader.onload = (ev) => {
+          obj.img.onload = () => {
+            obj.loaded = true;
+            draw();
+          };
+          obj.img.src = ev.target.result;
         };
         reader.readAsDataURL(file);
       });
+    }
+
+    // ------- BIND CONTROLS -------
+    bindText("text1", "text1");
+    bindText("text2", "text2");
+
+    const textColorInput = document.getElementById("textColor");
+    textColorInput.value = state.textColor;
+    textColorInput.addEventListener("input", () => {
+      state.textColor = textColorInput.value;
+      draw();
     });
 
-    // Top upload buttons -> parlay inputs
-    const bgInput = document.querySelector(".parlay-bg-slot input[type='file']");
-    const slipInput = document.querySelector(".parlay-slip-slot input[type='file']");
-    const playerInput = document.querySelector(".parlay-player-slot input[type='file']");
-
-    document.getElementById("bg-upload-btn").addEventListener("click", () => bgInput && bgInput.click());
-    document.getElementById("slip-upload-btn").addEventListener("click", () => slipInput && slipInput.click());
-    document.getElementById("player-upload-btn").addEventListener("click", () => playerInput && playerInput.click());
-
-    /* ---------- BG COLOR & PRESETS ---------- */
-    const bgPicker = document.getElementById("bg-color-picker");
-    function applyBg(color) {
-      root.style.setProperty("--sheet-bg-main", color);
-      document.body.style.background =
-        `radial-gradient(circle at top, ${color}, #050816 60%)`;
-      sheetEl.style.background =
-        `radial-gradient(circle at top, ${color}, #050816 60%)`;
-    }
-    applyBg(bgPicker.value);
-    bgPicker.addEventListener("input", e => applyBg(e.target.value));
-
-    const bgTemplateSelect = document.getElementById("bg-template-select");
-    const parlayBgSlot = document.querySelector(".parlay-bg-slot");
-    function applyBgTemplate(value) {
-      if (!parlayBgSlot) return;
-      let bg = "transparent";
-      if (value === "stadium-blue") {
-        bg = "radial-gradient(circle at top, #1b3f84 0%, #020614 55%), linear-gradient(to top, #0b0f22 15%, transparent 45%)";
-      } else if (value === "stadium-green") {
-        bg = "linear-gradient(to top, #0b5c2b 8%, transparent 40%), radial-gradient(circle at top, #1a3c7a 0%, #030814 55%)";
-      } else if (value === "dark-gradient") {
-        bg = "radial-gradient(circle at top, #391a5f 0%, #050816 60%)";
+    const textSizeInput = document.getElementById("textSize");
+    textSizeInput.value = state.textSize;
+    textSizeInput.addEventListener("input", () => {
+      const val = parseInt(textSizeInput.value, 10);
+      if (!Number.isNaN(val)) {
+        state.textSize = val;
+        draw();
       }
-      parlayBgSlot.style.background = bg;
-    }
-    applyBgTemplate(bgTemplateSelect.value);
-    bgTemplateSelect.addEventListener("change", e => applyBgTemplate(e.target.value));
-
-    /* ---------- 3-PLAYER CARD COLORS ---------- */
-    function setCardColor(idx, color) {
-      root.style.setProperty(`--card${idx}-color`, color);
-    }
-    const c1 = document.getElementById("card1-color");
-    const c2 = document.getElementById("card2-color");
-    const c3 = document.getElementById("card3-color");
-    setCardColor(1, c1.value);
-    setCardColor(2, c2.value);
-    setCardColor(3, c3.value);
-    c1.addEventListener("input", e => setCardColor(1, e.target.value));
-    c2.addEventListener("input", e => setCardColor(2, e.target.value));
-    c3.addEventListener("input", e => setCardColor(3, e.target.value));
-
-    /* ---------- TEMPLATE SWITCHING ---------- */
-    const templateSelect = document.getElementById("template-select");
-    const tplThree = document.getElementById("template-three");
-    const tplParlay = document.getElementById("template-parlay");
-    const cardControls = document.getElementById("card-color-controls");
-    const parlayControls = document.getElementById("parlay-controls");
-
-    function setTemplate(name) {
-      const styles = getComputedStyle(root);
-      const isThree = name === "three";
-
-      tplThree.classList.toggle("active", isThree);
-      tplParlay.classList.toggle("active", !isThree);
-      cardControls.style.display = isThree ? "flex" : "none";
-      parlayControls.style.display = isThree ? "none" : "flex";
-
-      if (isThree) {
-        root.style.setProperty("--sheet-width", styles.getPropertyValue("--sheet-width-wide"));
-        root.style.setProperty("--sheet-height", styles.getPropertyValue("--sheet-height-wide"));
-      } else {
-        root.style.setProperty("--sheet-width", styles.getPropertyValue("--sheet-width-phone"));
-        root.style.setProperty("--sheet-height", styles.getPropertyValue("--sheet-height-phone"));
-      }
-    }
-    setTemplate(templateSelect.value);
-    templateSelect.addEventListener("change", e => setTemplate(e.target.value));
-
-    /* ---------- PARLAY TEXT CONTROLS ---------- */
-    const fontSelect = document.getElementById("parlay-font-select");
-    const textColorInput = document.getElementById("parlay-text-color");
-    const textSizeInput = document.getElementById("parlay-text-size");
-    const text1X = document.getElementById("text1-x");
-    const text1Y = document.getElementById("text1-y");
-    const text2X = document.getElementById("text2-x");
-    const text2Y = document.getElementById("text2-y");
-
-    function applyParlayTextStyle() {
-      root.style.setProperty("--parlay-text-color", textColorInput.value);
-      root.style.setProperty("--parlay-text-size", textSizeInput.value + "px");
-      root.style.setProperty("--parlay-font", fontSelect.value);
-    }
-    function applyParlayTextPositions() {
-      root.style.setProperty("--t1-left", text1X.value + "%");
-      root.style.setProperty("--t1-bottom", text1Y.value + "%");
-      root.style.setProperty("--t2-left", text2X.value + "%");
-      root.style.setProperty("--t2-bottom", text2Y.value + "%");
-    }
-
-    [fontSelect, textColorInput, textSizeInput].forEach(el =>
-      el.addEventListener("input", applyParlayTextStyle)
-    );
-    [text1X, text1Y, text2X, text2Y].forEach(el =>
-      el.addEventListener("input", applyParlayTextPositions)
-    );
-    applyParlayTextStyle();
-    applyParlayTextPositions();
-
-    /* ---------- PARLAY SLIP + PLAYER LAYOUT SLIDERS ---------- */
-    const slipX = document.getElementById("slip-x");
-    const slipY = document.getElementById("slip-y");
-    const slipWidth = document.getElementById("slip-width");
-    const playerX = document.getElementById("player-x");
-    const playerY = document.getElementById("player-y");
-    const playerWidth = document.getElementById("player-width");
-
-    function applySlipLayout() {
-      root.style.setProperty("--slip-left", slipX.value);
-      root.style.setProperty("--slip-top", slipY.value);
-      root.style.setProperty("--slip-width", slipWidth.value);
-    }
-
-    function applyPlayerLayout() {
-      root.style.setProperty("--player-left", playerX.value);
-      root.style.setProperty("--player-bottom", playerY.value);
-      root.style.setProperty("--player-width", playerWidth.value);
-    }
-
-    [slipX, slipY, slipWidth].forEach(el =>
-      el.addEventListener("input", applySlipLayout)
-    );
-    [playerX, playerY, playerWidth].forEach(el =>
-      el.addEventListener("input", applyPlayerLayout)
-    );
-
-    applySlipLayout();
-    applyPlayerLayout();
-
-    // Reset button
-    document.getElementById("reset-parlay").addEventListener("click", () => {
-      fontSelect.value = "'Bebas Neue', sans-serif";
-      textColorInput.value = "#ffffff";
-      textSizeInput.value = 34;
-      text1X.value = 6;
-      text1Y.value = 4;
-      text2X.value = 6;
-      text2Y.value = 86;
-      applyParlayTextStyle();
-      applyParlayTextPositions();
-
-      slipX.value = 6;
-      slipY.value = 14;
-      slipWidth.value = 44;
-      playerX.value = 50;
-      playerY.value = 0;
-      playerWidth.value = 44;
-      applySlipLayout();
-      applyPlayerLayout();
     });
 
-    /* ---------- DOWNLOAD ---------- */
-    const downloadBtn = document.getElementById("download-btn");
-    const hiddenLink = document.getElementById("hidden-download-link");
-    const overlay = document.getElementById("download-overlay");
-    const overlayImg = document.getElementById("download-preview");
-    const closeOverlay = document.getElementById("close-overlay");
+    [
+      "t1x",
+      "t1y",
+      "t2x",
+      "t2y",
+      "slipX",
+      "slipY",
+      "slipWidth",
+      "playerX",
+      "playerY",
+      "playerWidth",
+    ].forEach((key) => bindRange(key, key));
 
-    closeOverlay.addEventListener("click", () => {
-      overlay.classList.remove("visible");
+    handleFileInput("bgFile", "bg");
+    handleFileInput("slipFile", "slip");
+    handleFileInput("playerFile", "player");
+
+    // ------- DOWNLOAD -------
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = "parlay.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
     });
 
-    downloadBtn.addEventListener("click", () => {
-      html2canvas(sheetEl, { scale: 3 }).then(canvas => {
-        const dataUrl = canvas.toDataURL("image/png");
-
-        if (isMobile()) {
-          overlayImg.src = dataUrl;
-          overlay.classList.add("visible");
-        } else {
-          hiddenLink.href = dataUrl;
-          hiddenLink.download = "bet-sheet.png";
-          hiddenLink.click();
-        }
-      });
-    });
+    // Initial draw
+    draw();
   </script>
 </body>
 </html>
