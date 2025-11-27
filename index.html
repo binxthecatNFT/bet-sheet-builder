@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Parlay + Player Builder (Phone)</title>
+  <title>Parlay + Player (Phone)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Bebas font -->
   <link
     href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
     rel="stylesheet"
@@ -150,12 +149,11 @@
       margin-top: 6px;
     }
 
-    /* The important bit: preview canvas uses the same aspect as export,
-       no cropping, just scaled down */
+    /* Key: preview canvas has same aspect as final export, no cropping */
     #previewCanvas {
       display: block;
       width: 100%;
-      height: auto; /* keeps aspect ratio */
+      height: auto;
       border-radius: 12px;
       background: #020617;
     }
@@ -204,20 +202,29 @@
       <div class="panel-title">Text</div>
       <div class="grid">
         <div class="field">
-          <label for="text1">Top text</label>
+          <label for="text1">T1 text</label>
           <input id="text1" type="text" placeholder="@LETSCASHSLIPS" />
         </div>
         <div class="field">
-          <label for="text2">Bottom text</label>
+          <label for="t1Size">T1 size</label>
+          <input id="t1Size" type="number" min="20" max="200" />
+        </div>
+        <div class="field">
+          <label for="text1Color">T1 color</label>
+          <input id="text1Color" type="color" />
+        </div>
+
+        <div class="field">
+          <label for="text2">T2 text</label>
           <input id="text2" type="text" placeholder="WEEK 13 PARLAYS" />
         </div>
         <div class="field">
-          <label for="textColor">Text color</label>
-          <input id="textColor" type="color" />
+          <label for="t2Size">T2 size</label>
+          <input id="t2Size" type="number" min="20" max="200" />
         </div>
         <div class="field">
-          <label for="textSize">Text size</label>
-          <input id="textSize" type="number" min="20" max="160" />
+          <label for="text2Color">T2 color</label>
+          <input id="text2Color" type="color" />
         </div>
       </div>
 
@@ -251,7 +258,7 @@
         </label>
         <label class="file-button">
           Parlay image
-          <input id="slipFile" type="file" accept="image/*" />
+          <input id="parlayFile" type="file" accept="image/*" />
         </label>
         <label class="file-button">
           Player PNG
@@ -287,61 +294,60 @@
       </div>
     </section>
 
-    <!-- PREVIEW -->
+    <!-- PREVIEW + DOWNLOAD -->
     <section class="panel">
-      <div class="panel-title">Preview (same as Download)</div>
+      <div class="panel-title">Preview (matches download)</div>
       <div class="preview-wrapper">
-        <!-- This canvas is BOTH the live preview and the exported image -->
         <canvas id="previewCanvas" width="1080" height="1920"></canvas>
       </div>
 
       <div class="actions">
-        <button id="downloadBtn">Download image</button>
+        <button id="downloadBtn">Download / Save image</button>
         <p class="hint">
-          On iPhone/Android: after Download, long‑press the image in your Photos
-          and choose “Save Image”.
+          On iPhone: this opens the PNG—then long‑press and choose “Save Image”.
+          On desktop/Android it downloads as a file.
         </p>
       </div>
     </section>
   </div>
 
   <script>
-    // ------- STATE SETUP -------
     const canvas = document.getElementById("previewCanvas");
     const ctx = canvas.getContext("2d");
 
     const state = {
       text1: "@LETSCASHSLIPS",
       text2: "WEEK 13 PARLAYS",
-      textColor: "#ffffff",
-      textSize: 80,
+      text1Color: "#ffffff",
+      text2Color: "#ffffff",
+      text1Size: 80,
+      text2Size: 64,
 
       t1x: 6,
-      t1y: 5,
+      t1y: 4,
       t2x: 6,
       t2y: 80,
 
       slipX: 5,
       slipY: 20,
-      slipWidth: 52,
+      slipWidth: 52, // percent of canvas width
 
       playerX: 56,
       playerY: 22,
-      playerWidth: 46,
+      playerWidth: 46 // percent of canvas width
     };
 
     const images = {
       bg: { img: new Image(), loaded: false },
-      slip: { img: new Image(), loaded: false },
-      player: { img: new Image(), loaded: false },
+      parlay: { img: new Image(), loaded: false },
+      player: { img: new Image(), loaded: false }
     };
 
-    // ------- DRAW FUNCTION (used for preview AND final download) -------
     function draw() {
       const w = canvas.width;
       const h = canvas.height;
 
-      // Clear and base background
+      // background
       ctx.clearRect(0, 0, w, h);
       const grd = ctx.createLinearGradient(0, 0, 0, h);
       grd.addColorStop(0, "#020617");
@@ -349,19 +355,19 @@
       ctx.fillStyle = grd;
       ctx.fillRect(0, 0, w, h);
 
-      // BG image stretched to fill canvas
+      // BG image stretched to fill
       if (images.bg.loaded) {
         ctx.drawImage(images.bg.img, 0, 0, w, h);
       }
 
       // Parlay slip
-      if (images.slip.loaded) {
+      if (images.parlay.loaded) {
         const slipW = (state.slipWidth / 100) * w;
-        const ratio = images.slip.img.height / images.slip.img.width;
+        const ratio = images.parlay.img.height / images.parlay.img.width;
         const slipH = slipW * ratio;
         const slipX = (state.slipX / 100) * w;
         const slipY = (state.slipY / 100) * h;
-        ctx.drawImage(images.slip.img, slipX, slipY, slipW, slipH);
+        ctx.drawImage(images.parlay.img, slipX, slipY, slipW, slipH);
       }
 
       // Player PNG
@@ -374,18 +380,20 @@
         ctx.drawImage(images.player.img, playerX, playerY, playerW, playerH);
       }
 
-      // Text
-      ctx.fillStyle = state.textColor;
+      // Text 1
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
-      ctx.font = `${state.textSize}px 'Bebas Neue', sans-serif`;
+      ctx.fillStyle = state.text1Color;
+      ctx.font = `${state.text1Size}px 'Bebas Neue', sans-serif`;
       ctx.fillText(
         state.text1,
         (state.t1x / 100) * w,
         (state.t1y / 100) * h
       );
 
-      ctx.font = `${state.textSize * 0.8}px 'Bebas Neue', sans-serif`;
+      // Text 2
+      ctx.fillStyle = state.text2Color;
+      ctx.font = `${state.text2Size}px 'Bebas Neue', sans-serif`;
       ctx.fillText(
         state.text2,
         (state.t2x / 100) * w,
@@ -393,7 +401,7 @@
       );
     }
 
-    // ------- HELPERS -------
+    // ------- helpers to bind inputs -------
     function bindText(id, key) {
       const el = document.getElementById(id);
       el.value = state[key];
@@ -408,6 +416,27 @@
       el.value = state[key];
       el.addEventListener("input", () => {
         state[key] = parseFloat(el.value);
+        draw();
+      });
+    }
+
+    function bindNumber(id, key) {
+      const el = document.getElementById(id);
+      el.value = state[key];
+      el.addEventListener("input", () => {
+        const v = parseFloat(el.value);
+        if (!Number.isNaN(v)) {
+          state[key] = v;
+          draw();
+        }
+      });
+    }
+
+    function bindColor(id, key) {
+      const el = document.getElementById(id);
+      el.value = state[key];
+      el.addEventListener("input", () => {
+        state[key] = el.value;
         draw();
       });
     }
@@ -431,53 +460,56 @@
       });
     }
 
-    // ------- BIND CONTROLS -------
+    // ------- bind everything -------
     bindText("text1", "text1");
     bindText("text2", "text2");
+    bindNumber("t1Size", "text1Size");
+    bindNumber("t2Size", "text2Size");
+    bindColor("text1Color", "text1Color");
+    bindColor("text2Color", "text2Color");
 
-    const textColorInput = document.getElementById("textColor");
-    textColorInput.value = state.textColor;
-    textColorInput.addEventListener("input", () => {
-      state.textColor = textColorInput.value;
-      draw();
-    });
+    ["t1x", "t1y", "t2x", "t2y", "slipX", "slipY", "slipWidth", "playerX", "playerY", "playerWidth"]
+      .forEach((key) => bindRange(key, key));
 
-    const textSizeInput = document.getElementById("textSize");
-    textSizeInput.value = state.textSize;
-    textSizeInput.addEventListener("input", () => {
-      const val = parseInt(textSizeInput.value, 10);
-      if (!Number.isNaN(val)) {
-        state.textSize = val;
-        draw();
+    handleFileInput("bgFile", "bg");
+    handleFileInput("parlayFile", "parlay");
+    handleFileInput("playerFile", "player");
+
+    // ------- download / save button -------
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const dataUrl = canvas.toDataURL("image/png");
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+      if (isIOS) {
+        // iOS Safari can't auto‑save to Photos from a webpage.
+        // Best UX: open the PNG so user can long‑press → "Save Image".
+        const win = window.open();
+        if (win) {
+          win.document.write(`
+            <html>
+              <head><title>Save image</title></head>
+              <body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;">
+                <img src="${dataUrl}" style="max-width:100%;height:auto;"/>
+              </body>
+            </html>
+          `);
+          win.document.close();
+        } else {
+          // Fallback if popups blocked
+          window.location.href = dataUrl;
+        }
+      } else {
+        // Desktop / Android: normal file download
+        const link = document.createElement("a");
+        link.download = "parlay.png";
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     });
 
-    [
-      "t1x",
-      "t1y",
-      "t2x",
-      "t2y",
-      "slipX",
-      "slipY",
-      "slipWidth",
-      "playerX",
-      "playerY",
-      "playerWidth",
-    ].forEach((key) => bindRange(key, key));
-
-    handleFileInput("bgFile", "bg");
-    handleFileInput("slipFile", "slip");
-    handleFileInput("playerFile", "player");
-
-    // ------- DOWNLOAD -------
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const link = document.createElement("a");
-      link.download = "parlay.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    });
-
-    // Initial draw
+    // first draw
     draw();
   </script>
 </body>
