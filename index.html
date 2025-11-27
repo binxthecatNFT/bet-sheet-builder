@@ -14,11 +14,11 @@
       --sheet-width-wide: 1600;
       --sheet-height-wide: 900;
 
-      /* Phone canvas for parlay (portrait) */
+      /* Phone canvas for parlay (4:5 portrait like a photo / IG post) */
       --sheet-width-phone: 1080;
-      --sheet-height-phone: 1920;
+      --sheet-height-phone: 1350;
 
-      /* Active canvas (starts on 3-player) */
+      /* Active canvas */
       --sheet-width: 1600;
       --sheet-height: 900;
 
@@ -36,10 +36,20 @@
       --parlay-text-size: 34px;
       --parlay-font: "Bebas Neue", sans-serif;
 
-      --t1-left: 5%;
+      --t1-left: 6%;
       --t1-bottom: 4%;
-      --t2-left: 5%;
+      --t2-left: 6%;
       --t2-bottom: 86%;
+
+      /* Parlay slip box (% of sheet) */
+      --slip-left: 6;
+      --slip-top: 14;
+      --slip-width: 44;  /* bigger default */
+
+      /* Player box (% of sheet) */
+      --player-left: 50;
+      --player-bottom: 0;
+      --player-width: 44;
     }
 
     * { box-sizing: border-box; }
@@ -264,7 +274,7 @@
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: contain;  /* important: no stretching */
+      object-fit: contain;  /* no stretching */
       opacity: 0;
       transition: opacity 0.2s;
       pointer-events: none;
@@ -349,7 +359,7 @@
     }
     .player-notes li + li { margin-top: 4px; }
 
-    /* PARLAY TEMPLATE */
+    /* PARLAY TEMPLATE (phone) */
     .template-parlay { position: relative; }
 
     .parlay-wrapper {
@@ -369,39 +379,40 @@
       background-size: cover;
       background-position: center;
     }
-    .parlay-bg-slot img { object-fit: cover; }
+    .parlay-bg-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.85);
+    }
 
-    /* BIG parlay slip on the left */
+    /* Big parlay slip box on left, fixed aspect ratio */
     .parlay-slip-slot {
       position: absolute;
-      left: 3%;
-      top: 10%;
-      width: 46%;
-      height: 82%;
+      left: calc(var(--slip-left) * 1%);
+      top: calc(var(--slip-top) * 1%);
+      width: calc(var(--slip-width) * 1%);
+      aspect-ratio: 9 / 19.5;  /* phone-ish screenshot shape */
       border-radius: 18px;
-      background: rgba(0,0,0,0.9);
+      background: #101010;
       box-shadow: 0 14px 30px rgba(0,0,0,0.8);
       z-index: 2;
       padding: 8px;
-      transform-origin: center center;
-      transform: translate(0px, 0px) scale(1);
-      touch-action: none;
     }
+    .parlay-slip-slot img { object-fit: contain; }
 
-    /* BIG player on the right */
+    /* Big player box on right, fixed aspect ratio */
     .parlay-player-slot {
       position: absolute;
-      right: 0;
-      bottom: -3%;
-      width: 52%;
-      height: 110%;
+      left: calc(var(--player-left) * 1%);
+      bottom: calc(var(--player-bottom) * 1%);
+      width: calc(var(--player-width) * 1%);
+      aspect-ratio: 2 / 3; /* tall player */
       border-radius: 0;
       background: transparent;
       border: none;
       z-index: 4;
-      transform-origin: bottom center;
-      transform: translate(0px, 0px) scale(1);
-      touch-action: none;
+      overflow: visible;
     }
     .parlay-player-slot img { object-fit: contain; }
 
@@ -476,8 +487,8 @@
 <body>
   <div class="app-header">
     <div class="app-header-left">
-      Tap text to edit. Use the dotted boxes or the buttons to upload images.  
-      On the parlay template: <strong>drag</strong> the parlay or player with one finger, <strong>pinch</strong with two to resize.
+      Tap text to edit. Tap dotted boxes or buttons to upload images.  
+      Parlay template exports as a **phone-shaped 4:5 image**. Photos will not stretch.
     </div>
 
     <div class="app-header-controls">
@@ -545,7 +556,7 @@
         <div class="control-row">
           <label class="pill">
             T1 X
-            <input type="range" id="text1-x" min="0" max="100" value="5" />
+            <input type="range" id="text1-x" min="0" max="100" value="6" />
           </label>
           <label class="pill">
             T1 Y
@@ -553,7 +564,7 @@
           </label>
           <label class="pill">
             T2 X
-            <input type="range" id="text2-x" min="0" max="100" value="5" />
+            <input type="range" id="text2-x" min="0" max="100" value="6" />
           </label>
           <label class="pill">
             T2 Y
@@ -561,6 +572,38 @@
           </label>
         </div>
 
+        <!-- Slip + Player layout sliders -->
+        <div class="control-row">
+          <label class="pill">
+            Slip X
+            <input type="range" id="slip-x" min="0" max="30" value="6" />
+          </label>
+          <label class="pill">
+            Slip Y
+            <input type="range" id="slip-y" min="0" max="40" value="14" />
+          </label>
+          <label class="pill">
+            Slip width
+            <input type="range" id="slip-width" min="30" max="60" value="44" />
+          </label>
+        </div>
+
+        <div class="control-row">
+          <label class="pill">
+            Player X
+            <input type="range" id="player-x" min="30" max="80" value="50" />
+          </label>
+          <label class="pill">
+            Player Y
+            <input type="range" id="player-y" min="0" max="30" value="0" />
+          </label>
+          <label class="pill">
+            Player width
+            <input type="range" id="player-width" min="30" max="60" value="44" />
+          </label>
+        </div>
+
+        <!-- Upload buttons -->
         <div class="control-row">
           <button type="button" id="bg-upload-btn" class="btn-secondary">BG image</button>
           <button type="button" id="slip-upload-btn" class="btn-secondary">Parlay image</button>
@@ -663,7 +706,7 @@
             <input type="file" accept="image/*" />
           </div>
 
-          <!-- Slip (drag + pinch) -->
+          <!-- Slip -->
           <div class="image-slot parlay-slip-slot">
             <div class="upload-ui">
               <span class="plus">+</span>
@@ -673,7 +716,7 @@
             <input type="file" accept="image/*" />
           </div>
 
-          <!-- Player (drag + pinch) -->
+          <!-- Player -->
           <div class="image-slot parlay-player-slot">
             <div class="upload-ui">
               <span class="plus">+</span>
@@ -841,124 +884,56 @@
     applyParlayTextStyle();
     applyParlayTextPositions();
 
-    /* ---------- DRAG + PINCH (SLIP & PLAYER) ---------- */
-    function makeTransformable(el, options = {}) {
-      const minScale = options.minScale || 0.5;
-      const maxScale = options.maxScale || 2.0;
-      const defaultScale = options.initialScale || 1;
-      let pointers = new Map();
-      let tx = options.initialX || 0;
-      let ty = options.initialY || 0;
-      let scale = defaultScale;
-      let dragStartX = 0, dragStartY = 0, startTx = 0, startTy = 0;
-      let pinchStartDist = 0, startScale = defaultScale;
+    /* ---------- PARLAY SLIP + PLAYER LAYOUT SLIDERS ---------- */
+    const slipX = document.getElementById("slip-x");
+    const slipY = document.getElementById("slip-y");
+    const slipWidth = document.getElementById("slip-width");
+    const playerX = document.getElementById("player-x");
+    const playerY = document.getElementById("player-y");
+    const playerWidth = document.getElementById("player-width");
 
-      function update() {
-        el.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-      }
-      update();
-      el.style.touchAction = "none";
-
-      el.addEventListener("pointerdown", e => {
-        el.setPointerCapture(e.pointerId);
-        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-        if (pointers.size === 1) {
-          const p = pointers.get(e.pointerId);
-          dragStartX = p.x;
-          dragStartY = p.y;
-          startTx = tx;
-          startTy = ty;
-          pinchStartDist = 0;
-        } else if (pointers.size === 2) {
-          const pts = Array.from(pointers.values());
-          pinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-          startScale = scale;
-        }
-      });
-
-      el.addEventListener("pointermove", e => {
-        if (!pointers.has(e.pointerId)) return;
-        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-        if (pointers.size === 1 && pinchStartDist === 0) {
-          const p = Array.from(pointers.values())[0];
-          const dx = p.x - dragStartX;
-          const dy = p.y - dragStartY;
-          tx = startTx + dx;
-          ty = startTy + dy;
-          update();
-        } else if (pointers.size >= 2) {
-          const pts = Array.from(pointers.values());
-          const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-          if (pinchStartDist > 0) {
-            let factor = dist / pinchStartDist;
-            scale = startScale * factor;
-            scale = Math.max(minScale, Math.min(maxScale, scale));
-            update();
-          }
-        }
-      });
-
-      function endPointer(e) {
-        if (pointers.has(e.pointerId)) {
-          pointers.delete(e.pointerId);
-        }
-        if (pointers.size < 2) {
-          pinchStartDist = 0;
-        }
-      }
-
-      ["pointerup", "pointercancel", "pointerleave", "pointerout"].forEach(type => {
-        el.addEventListener(type, endPointer);
-      });
-
-      // Optional wheel zoom on desktop
-      el.addEventListener("wheel", e => {
-        e.preventDefault();
-        const delta = -e.deltaY * 0.001;
-        scale = Math.max(minScale, Math.min(maxScale, scale * (1 + delta)));
-        update();
-      }, { passive: false });
-
-      return {
-        reset() {
-          tx = options.initialX || 0;
-          ty = options.initialY || 0;
-          scale = defaultScale;
-          update();
-        }
-      };
+    function applySlipLayout() {
+      root.style.setProperty("--slip-left", slipX.value);
+      root.style.setProperty("--slip-top", slipY.value);
+      root.style.setProperty("--slip-width", slipWidth.value);
     }
 
-    const slipSlot = document.querySelector(".parlay-slip-slot");
-    const playerSlot = document.querySelector(".parlay-player-slot");
+    function applyPlayerLayout() {
+      root.style.setProperty("--player-left", playerX.value);
+      root.style.setProperty("--player-bottom", playerY.value);
+      root.style.setProperty("--player-width", playerWidth.value);
+    }
 
-    const slipTransform = makeTransformable(slipSlot, {
-      minScale: 0.7,
-      maxScale: 1.6,
-      initialScale: 1.15
-    });
+    [slipX, slipY, slipWidth].forEach(el =>
+      el.addEventListener("input", applySlipLayout)
+    );
+    [playerX, playerY, playerWidth].forEach(el =>
+      el.addEventListener("input", applyPlayerLayout)
+    );
 
-    const playerTransform = makeTransformable(playerSlot, {
-      minScale: 0.7,
-      maxScale: 1.8,
-      initialScale: 1.25
-    });
+    applySlipLayout();
+    applyPlayerLayout();
 
     // Reset button
     document.getElementById("reset-parlay").addEventListener("click", () => {
       fontSelect.value = "'Bebas Neue', sans-serif";
       textColorInput.value = "#ffffff";
       textSizeInput.value = 34;
-      text1X.value = 5;
+      text1X.value = 6;
       text1Y.value = 4;
-      text2X.value = 5;
+      text2X.value = 6;
       text2Y.value = 86;
       applyParlayTextStyle();
       applyParlayTextPositions();
-      slipTransform.reset();
-      playerTransform.reset();
+
+      slipX.value = 6;
+      slipY.value = 14;
+      slipWidth.value = 44;
+      playerX.value = 50;
+      playerY.value = 0;
+      playerWidth.value = 44;
+      applySlipLayout();
+      applyPlayerLayout();
     });
 
     /* ---------- DOWNLOAD ---------- */
